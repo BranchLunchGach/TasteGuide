@@ -21,19 +21,20 @@ import lombok.Setter;
 @Setter
 @Builder
 public class User {
+	
 	@Id
 	@Column(name = "user_no")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int userNo;
 	
-	@Column(name = "user_id")
+	@Column(name = "user_id", unique = true)
 	private String userId;
 	private String password;
-	private String address;
-	private String gender;
+	private String address; 
+	private String gender; // Boolean 어떤지..? 
 	private String phone;
 	private String email;
-	private String taste;
+	private String taste; // 취향(,구분)
 	
 	@Column(name = "birth_date")
 	private LocalDate birthDate;
