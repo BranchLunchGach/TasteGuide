@@ -1,12 +1,13 @@
 package com.web.spring.entity;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
-import org.springframework.data.annotation.CreatedDate;
+import org.hibernate.annotations.CreationTimestamp;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -24,13 +25,13 @@ import lombok.Setter;
 @Builder
 public class Choice {
 	@Id
-	@GeneratedValue
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "choice_id")
 	private int choiceId;
 
-	@CreatedDate
+	@CreationTimestamp
 	@Column(name = "choice_date")
-	private LocalDate choiceDate;
+	private LocalDateTime choiceDate;
 	
 	@ManyToOne
 	@JoinColumn(name = "user_no")

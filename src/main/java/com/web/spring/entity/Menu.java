@@ -29,20 +29,20 @@ public class Menu {
 	@Column(name = "sub_categorie")
 	private String subCategorie;
 	private String recipe;
-	private int scoville;
+	//private int scoville;
 	private String nation;
 	private int calorie;
 	private String concept;
 	private Float fat;
 	private Float carbohydrate;
 	private Float protein;
-	@Override
-	public String toString() {
-		return "Menu [menuId=" + menuId + ", majorCategorie=" + majorCategorie + ", middleCategorie=" + middleCategorie
-				+ ", subCategorie=" + subCategorie + ", recipe=" + recipe + ", scoville=" + scoville + ", nation="
-				+ nation + ", calorie=" + calorie + ", concept=" + concept + ", fat=" + fat + ", carbohydrate="
-				+ carbohydrate + ", protein=" + protein + "]";
-	}
+	
+	@Column(name = "img_url")
+	private String imgUrl;
+	private String weather;
+	private String season;
+	private String holiday;
+	
 	
 	
 	
