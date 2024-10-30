@@ -22,10 +22,13 @@ public class Menu {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "menu_id")
 	private int menuId;
+	
 	@Column(name = "major_categorie")
 	private String majorCategorie;
+	
 	@Column(name = "middle_categorie")
 	private String middleCategorie;
+	
 	@Column(name = "sub_categorie")
 	private String subCategorie;
 	private String recipe;
@@ -33,9 +36,15 @@ public class Menu {
 	private String nation;
 	private int calorie;
 	private String concept;
-	private Float fat;
-	private Float carbohydrate;
-	private Float protein;
+	
+	@Column(columnDefinition = "decimal(5,2)")
+	private double fat;
+	
+	@Column(columnDefinition = "decimal(5,2)")
+	private double carbohydrate;
+	
+	@Column(columnDefinition = "decimal(5,2)")
+	private double protein;
 	
 	@Column(name = "img_url")
 	private String imgUrl;

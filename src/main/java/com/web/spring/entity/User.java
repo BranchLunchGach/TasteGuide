@@ -5,6 +5,8 @@ import java.time.LocalDate;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -21,19 +23,23 @@ import lombok.Setter;
 @Setter
 @Builder
 public class User {
+	
 	@Id
 	@Column(name = "user_no")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int userNo;
 	
-	@Column(name = "user_id")
+	@Column(name = "user_id", unique = true)
 	private String userId;
 	private String password;
 	private String address;
-	private String gender;
+	
+	@Enumerated(EnumType.STRING)
+	private Gender gender; // Boolean 어떤지..? 
+	
 	private String phone;
 	private String email;
-	private String taste;
+	private String taste; // 취향(,구분)
 	
 	@Column(name = "birth_date")
 	private LocalDate birthDate;
