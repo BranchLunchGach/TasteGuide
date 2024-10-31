@@ -31,6 +31,7 @@ public class Menu {
 	
 	@Column(name = "sub_categorie")
 	private String subCategorie;
+	private boolean soup;
 	private String recipe;
 	//private int scoville;
 	private String nation;
@@ -51,9 +52,5 @@ public class Menu {
 	private String weather;
 	private String season;
 	private String holiday;
-	
-	
-	
-	
 	
 }
