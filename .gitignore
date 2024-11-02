@@ -3,6 +3,9 @@
 *.classpath
 # Log file
 *.log
+#application.properties
+application.properties
+
 
 HELP.md
 target/

@@ -38,7 +38,6 @@ public class User {
 	private Gender gender; // Boolean 어떤지..? 
 	
 	private String phone;
-	private String email;
 	private String taste; // 취향(,구분)
 	
 	@Column(name = "birth_date")
@@ -47,7 +46,7 @@ public class User {
 	@Override
 	public String toString() {
 		return "User [userNo=" + userNo + ", userId=" + userId + ", password=" + password + ", address=" + address
-				+ ", gender=" + gender + ", phone=" + phone + ", email=" + email + ", taste=" + taste + ", birthDate="
+				+ ", gender=" + gender + ", phone=" + phone + ", taste=" + taste + ", birthDate="
 				+ birthDate + "]";
 	}
 	
