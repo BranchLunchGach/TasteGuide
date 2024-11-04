@@ -1,18 +1,13 @@
 package com.web.spring;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.transaction.annotation.Transactional;
 
-import com.web.spring.repository.MenuRepository;
+import lombok.RequiredArgsConstructor;
 
 @SpringBootApplication
-public class TasteGuideApplication {
+@RequiredArgsConstructor
+public class TasteGuideApplication{
 	/*
 	@Autowired
 	private MenuRepository menuRepository;
@@ -30,6 +25,7 @@ public class TasteGuideApplication {
 */
 	public static void main(String[] args) {
 		SpringApplication.run(TasteGuideApplication.class, args);
+		
 	}
 
 }
