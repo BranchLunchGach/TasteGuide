@@ -25,8 +25,8 @@ public class MenuController {
 		Map<String, List<String>> menuMap = new HashMap<>();
 		menuMap.put("nation", Arrays.asList(menuReq.getNation().split(",")));
 		menuMap.put("category", Arrays.asList(menuReq.getCategory().split(",")));
-		menuMap.put("concept", Arrays.asList(menuReq.getKeyword().split(",")));
-		menuMap.put("soup", Arrays.asList(menuReq.getSoup()));
+		menuMap.put("keyword", Arrays.asList(menuReq.getKeyword().split(",")));
+		menuMap.put("soup", Arrays.asList(menuReq.getSoup().split(",")));
 		return ResponseEntity.status(201).body(menuService.nugury(menuMap));
 	}
 }

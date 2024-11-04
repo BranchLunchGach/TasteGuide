@@ -1,6 +1,6 @@
 package com.web.spring.dto;
 
-import java.util.Stack;
+import java.util.List;
 
 import com.web.spring.entity.Menu;
 
@@ -25,9 +25,9 @@ public class MenuRes {
 	private double carbohydrate;
 	private double protein;
 	private String imgUrl;
-	private Stack<String> recoReason;
+	private List<String> recoReason;
 	
-	public MenuRes(Menu menu, Stack<String> recoReason) {
+	public MenuRes(Menu menu, List<String> recoReason) {
 		category = menu.getCategory();
 		menuName = menu.getMenuName();
 		calorie = menu.getCalorie();
