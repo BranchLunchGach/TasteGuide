@@ -11,14 +11,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.web.spring.dto.MenuReq;
-import com.web.spring.service.MenuService;
+import com.web.spring.service.MenuServiceExample;
 
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
 public class MenuController {
-	private final MenuService menuService;
+	private final MenuServiceExample menuService;
 	
 	@PostMapping("/menu")
 	public ResponseEntity<?> nugury(@RequestBody MenuReq menuReq){
