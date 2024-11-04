@@ -32,6 +32,7 @@ public class SecurityConfig {
     	//경로별 인가작업
     	http.authorizeHttpRequests((auth) -> auth
     										 .requestMatchers("/menu").permitAll()
+    										 .requestMatchers("/swagger-ui", "/swagger-ui/**","/api/logistics","/api/swagger-config","/v3/api-docs/**").permitAll()
     										 .requestMatchers("/admin").hasRole("ADMIN")
     										 .anyRequest().authenticated());//인증을 거쳐서 들어와야한다.
 		return http.build();
