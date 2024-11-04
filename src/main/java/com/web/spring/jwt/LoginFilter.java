@@ -31,25 +31,25 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter{
 	
 	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
 			throws AuthenticationException{
-	//1. 클라이언트 로그인 요청시 id, password 받아서 출력
+	//1. 클라이언트 로그인 요청시 id, password 받아서 출력	
 	String username=super.obtainUsername(request);//id
 	String password = super.obtainPassword(request);//password
 	
-	log.info("username{}",username);
-	log.info("password{}",password);
+	log.info("username1="+username);
+	log.info("password2="+password);
 	
 	//2. 스프링 시큐러티에서는 username, password를 검증하기 위해서 ~~token에 담는다.
 	//지금은 authorization은 없어서  null 로 담았다.
 	UsernamePasswordAuthenticationToken authToken = 
 	new UsernamePasswordAuthenticationToken(username, password,null);
-	
+	log.info("authToken="+authToken);
 	//3. token을 ~Manager에 전달...Provoder...DetailsServicve...db연결...CustomMemberDetails생성..Back/Back/...
 	Authentication authentication=authenticationManager.authenticate(authToken);//CustomMemberDetails정보를 반환...
 	log.info("authentication{}",authentication);
 	return authentication;
 	}//
 	
-	//로그인 성공시 실행하는 메소드 (여기서 JWT를 발급하면 됨)
+	//로그인 성공시 실행하는 메소드 (여기서 JWT를 발급하면 됨)post
     @Override
     protected void successfulAuthentication(HttpServletRequest request,
                                             HttpServletResponse response,
