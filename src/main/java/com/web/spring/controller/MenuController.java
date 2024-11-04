@@ -11,14 +11,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.web.spring.dto.MenuReq;
-import com.web.spring.service.MenuServiceExample;
+import com.web.spring.service.MenuService;
 
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
 public class MenuController {
-	private final MenuServiceExample menuService;
+	private final MenuService menuService;
 	
 	@PostMapping("/menu")
 	public ResponseEntity<?> nugury(@RequestBody MenuReq menuReq){
@@ -27,6 +27,6 @@ public class MenuController {
 		menuMap.put("category", Arrays.asList(menuReq.getCategory().split(",")));
 		menuMap.put("keyword", Arrays.asList(menuReq.getKeyword().split(",")));
 		menuMap.put("soup", Arrays.asList(menuReq.getSoup().split(",")));
-		return ResponseEntity.status(201).body(menuService.nugury(menuMap));
+		return ResponseEntity.status(201).body(menuService.recommend(menuMap));
 	}
 }
