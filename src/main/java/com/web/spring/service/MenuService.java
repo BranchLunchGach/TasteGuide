@@ -1,5 +1,7 @@
 package com.web.spring.service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -9,12 +11,17 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Stack;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.web.spring.dto.MenuRes;
+import com.web.spring.entity.Choice;
 import com.web.spring.entity.Menu;
+import com.web.spring.entity.User;
 import com.web.spring.repository.ChoiceRepository;
 import com.web.spring.repository.MenuRepository;
+import com.web.spring.security.CustomUserDetails;
 
 import lombok.RequiredArgsConstructor;
 
@@ -41,7 +48,15 @@ public class MenuService {
 		Map<Menu, Integer> menuMap = new HashMap<>();
 		
 		//3. (2차 필터링) DB의 choice 테이블에서 사용자가 최근 2일동안 추천받은 메뉴들을 가져와서 map에서 제거
-		
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		List<Choice> choiceList = new ArrayList<>();
+		if(authentication.getName()!=null && !authentication.getName().equals("anonymousUser")) {
+			LocalDateTime nowDateTime = LocalDate.now().atStartOfDay();
+			LocalDateTime twoDay = nowDateTime.minusDays(2);
+			CustomUserDetails customUserDetails = (CustomUserDetails)authentication.getPrincipal();
+			int userNo = customUserDetails.getUser().getUserNo();
+			choiceList = choiceRepository.findChoice(twoDay, userNo).orElseThrow();
+		}
 		//4. 각 메뉴들의 이유를 저장해두는 map 생성
 		Map<String, Stack<String>> menuReason = new HashMap<>();
 		//3차 필터링은 추후에 논문 참고하여 일치했을때 가중치 5~7점으로 세분화
@@ -114,6 +129,13 @@ public class MenuService {
 			if(menuReqList.get("nation").contains(menu.getNation())) reasons.push(menu.getNation() + "에 해당하는 메뉴입니다.");
 			if(menuReqList.get("category").contains(menu.getCategory())) reasons.push(menu.getCategory() + "에 해당하는 메뉴입니다.");
 			int weight = 0;
+			if(!choiceList.isEmpty()) {
+				for(Choice c : choiceList) {
+					if(menu.equals(c.getMenu())) {
+						weight -= 100;
+					}
+				}
+			}
 			
 			for(int i = 0; i < menuReqList.get("soup").size(); i++) {
 				switch (menuReqList.get("soup").get(i)) {

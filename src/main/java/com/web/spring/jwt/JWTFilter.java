@@ -65,12 +65,14 @@ public class JWTFilter extends OncePerRequestFilter {
         String username = jwtUtil.getUsername(token);
         String id = jwtUtil.getId(token);
         String role = jwtUtil.getRole(token);
+        int userNo = jwtUtil.getUserNo(token);
 				
         //userEntity를 생성하여 값 set
         //스프링 컨테이너에서는 무상태를 유지하고 있기 떄문에 지금 들어온 요청이 누구인지 확인할 수 없다...member객체 생성하는 이유
         //인증된 사용자의 정보를 계속해서 유지하려면 서버가 인증된 사용자의 정보를 알고 있어야 한다.
         //예전에는 세션에서 꺼내썼지만 지금은 토큰에서 뽑아서 Claim에 대한 정보를 꺼내서 member객체를 생성
         User user = new User();
+        user.setUserNo(userNo);
         user.setUserId(id);
         user.setName(username);
         user.setRole(role);

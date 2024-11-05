@@ -29,6 +29,14 @@ public class JWTUtil {
         secretKey = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS256.key().build().getAlgorithm());
     }
     
+    //검증 UserId
+    public int getUserNo(String token) {
+    	log.info("getUserId(String token)  call");
+    	int re = Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("userNo", Integer.class);
+    	log.info("getUserId(String token)  re = {}" ,re);
+    	return re;
+    }
+
     //검증 Username
     public String getUsername(String token) {
          log.info("getUsername(String token)  call");
@@ -65,6 +73,7 @@ public class JWTUtil {
     public String createJwt(User user, String role, Long expiredMs) {
         log.info("createJwt  call");
         return Jwts.builder()
+        		.claim("userNo", user.getUserNo()) //이름
                 .claim("username", user.getName()) //이름
                 .claim("id", user.getUserId()) //아이디
                 .claim("role", role) //Role
