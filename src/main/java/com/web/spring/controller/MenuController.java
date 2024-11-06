@@ -22,6 +22,7 @@ public class MenuController {
 	
 	@PostMapping("/menu")
 	public ResponseEntity<?> nugury(@RequestBody MenuReq menuReq){
+		System.out.println(menuReq.getNation());
 		Map<String, List<String>> menuMap = new HashMap<>();
 		
 		List<String> nationList = (menuReq.getNation()==null) ? Arrays.asList("양식","한식","중식","일식") : Arrays.asList(menuReq.getNation().split(","));
@@ -36,6 +37,13 @@ public class MenuController {
 		List<String> soupList = (menuReq.getSoup()==null) ? Arrays.asList("true","false") : Arrays.asList(menuReq.getSoup().split(","));
 		menuMap.put("soup", soupList);
 		
+		List<String> selectNameList = (menuReq.getSelectName()==null) ? Arrays.asList("") : Arrays.asList(menuReq.getSelectName().split(","));
+		menuMap.put("selectName", selectNameList);
+		System.out.println(nationList);
+		System.out.println(categoryList);
+		System.out.println(keywordList);
+		System.out.println(soupList);
+		System.out.println(selectNameList);
 		return ResponseEntity.status(201).body(menuService.recommend(menuMap));
 	}
 }

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.web.spring.entity.User;
+import com.web.spring.exception.BoardSearchNotException;
 import com.web.spring.exception.MemberAuthenticationException;
 import com.web.spring.repository.UserRepository;
 
@@ -68,6 +69,33 @@ public class UserService {
 			return number;
 		}
 		
+		@Transactional
+		public String findUserId(User user) {
+			log.info("name"+user.getName());
+			log.info("phone"+user.getPhone());			
+			User rUser = userRepository.findByNameAndPhone(user.getName(), user.getPhone());
+			if(rUser != null) {
+				log.info("rUser ="+ rUser.toString());
+				String userId = rUser.getUserId();
+				return userId;
+			}else {
+				return null;
+			}
+			
+		}
+		
+		@Transactional
+		public int updatePassword(String password, String userId) {
+			User rUser = userRepository.findByUserId(userId);
+			if(rUser != null) {
+				log.info("rUser="+rUser.toString());
+				String encPass= passwordEncoder.encode(password);
+				rUser.setPassword(encPass);
+				
+				return 1;
+			}
+			return 0;
+		}
 	
 	
 	

@@ -26,8 +26,13 @@ public class MenuRes {
 	private double protein;
 	private String imgUrl;
 	private List<String> recoReason;
+	private String selectNation;
+	private String selectCategory;
+	private String selectSoup;
+	private String selectKeyword;
 	
-	public MenuRes(Menu menu, List<String> recoReason) {
+	
+	public MenuRes(Menu menu, List<String> recoReason,String selectNation, String selectCategory,String selectSoup,String selectKeyword) {
 		category = menu.getCategory();
 		menuName = menu.getMenuName();
 		calorie = menu.getCalorie();
@@ -36,6 +41,12 @@ public class MenuRes {
 		protein = menu.getProtein();
 		imgUrl = menu.getImgUrl();
 		this.recoReason = recoReason;
+		this.selectNation = selectNation;
+		this.selectCategory = selectCategory;
+		this.selectSoup = selectSoup;
+		this.selectKeyword = selectKeyword;
+
+		
 	}
 }
 	

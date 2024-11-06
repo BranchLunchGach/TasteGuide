@@ -162,7 +162,7 @@ public class MenuServiceExample {
 			if(menuReason.get(menu.getMenuName()).isEmpty()) break;
 			menuReasonList.add(menuReason.get(menu.getMenuName()).pop());
 		}
-		menuResList.add(new MenuRes(menu, menuReasonList));
+		menuResList.add(new MenuRes(menu, menuReasonList, holiday, holiday, holiday, holiday));
 		boolean fin = false;
 		int index = 1;
 		while(!fin) {
@@ -173,7 +173,7 @@ public class MenuServiceExample {
 					if(menuReason.get(secondMenu.getMenuName()).isEmpty()) break;
 					menuReasonList.add(menuReason.get(secondMenu.getMenuName()).pop());
 				}
-				menuResList.add(new MenuRes(secondMenu, menuReasonList));
+				menuResList.add(new MenuRes(secondMenu, menuReasonList, holiday, holiday, holiday, holiday));
 				fin = true;
 			}
 			index++;
