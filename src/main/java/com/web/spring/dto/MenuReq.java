@@ -17,6 +17,7 @@ public class MenuReq {
 	private String keyword;
 	private String soup;
 	private String selectName;
+	private String weather;
 }
 	
 	

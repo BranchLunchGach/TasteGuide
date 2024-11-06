@@ -1,3 +1,4 @@
+
 package com.web.spring.controller;
 
 import java.util.Arrays;
@@ -21,8 +22,7 @@ public class MenuController {
 	private final MenuService menuService;
 	
 	@PostMapping("/menu")
-	public ResponseEntity<?> nugury(@RequestBody MenuReq menuReq){
-		System.out.println(menuReq.getNation());
+	public ResponseEntity<?> recommand(@RequestBody MenuReq menuReq){
 		Map<String, List<String>> menuMap = new HashMap<>();
 		
 		List<String> nationList = (menuReq.getNation()==null) ? Arrays.asList("양식","한식","중식","일식") : Arrays.asList(menuReq.getNation().split(","));
@@ -39,11 +39,10 @@ public class MenuController {
 		
 		List<String> selectNameList = (menuReq.getSelectName()==null) ? Arrays.asList("") : Arrays.asList(menuReq.getSelectName().split(","));
 		menuMap.put("selectName", selectNameList);
-		System.out.println(nationList);
-		System.out.println(categoryList);
-		System.out.println(keywordList);
-		System.out.println(soupList);
-		System.out.println(selectNameList);
+		
+		List<String> weatherList = Arrays.asList(menuReq.getWeather());
+		menuMap.put("weather", weatherList);
+		
 		return ResponseEntity.status(201).body(menuService.recommend(menuMap));
 	}
 }
