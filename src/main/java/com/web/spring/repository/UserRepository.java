@@ -12,6 +12,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 	@Query(value = "SELECT u FROM User u Where userId = ?1")
 	User duplicateCheck(String userId);
 	Boolean existsByUserId(String userId);
+	User findByNameAndPhone(String name, String phone);
 	
 	
 }

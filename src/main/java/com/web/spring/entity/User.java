@@ -45,13 +45,15 @@ public class User {
 	private LocalDate birthDate;
 	
 	private String role;
-	
+
 	@Override
 	public String toString() {
-		return "User [userNo=" + userNo + ", userId=" + userId + ", password=" + password + ", address=" + address
-				+ ", gender=" + gender + ", phone=" + phone + ", taste=" + taste + ", birthDate="
-				+ birthDate + "]";
+		return "User [userNo=" + userNo + ", userId=" + userId + ", password=" + password + ", name=" + name
+				+ ", address=" + address + ", gender=" + gender + ", phone=" + phone + ", taste=" + taste
+				+ ", birthDate=" + birthDate + ", role=" + role + "]";
 	}
+	
+	
 	
 	
 	

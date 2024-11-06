@@ -33,6 +33,7 @@ public class MenuService {
 	private final ChoiceRepository choiceRepository;
 	
 	public List<MenuRes> recommend(Map<String, List<String>> menuReqList) {
+		
 		/*
 		 1. (1차 필터링) DB의 menu 테이블에서 카테고리와 국가에 해당하는 메뉴만 1차적으로 걸러서 가져옴 (카테고리와 국가가 모두 일치하는 메뉴만)
 		 			  만약 1차필터링에서 가져온 메뉴가 1개 이하일때는 디비에서 카테고리가 일치하는 메뉴 + 국가가 일치하는 메뉴 다 가져옴
@@ -137,6 +138,12 @@ public class MenuService {
 				}
 			}
 			
+			for(String selectName : menuReqList.get("selectName")) {
+				if(menu.getMenuName().equals(selectName)) {
+					weight -= 100;
+				}				
+			}
+			
 			for(int i = 0; i < menuReqList.get("soup").size(); i++) {
 				switch (menuReqList.get("soup").get(i)) {
 					case "true": {				
@@ -156,10 +163,10 @@ public class MenuService {
 				}				
 			}
 			
-			for(String keyword : menuReqList.get("keyword")) {
-				if(menu.getKeyword().contains(keyword)) {
+			for(String k : menuReqList.get("keyword")) {
+				if(menu.getKeyword().contains(k)) {
 					weight += 11;
-					reasons.push(keyword + " 메뉴입니다.");
+					reasons.push(k + " 메뉴입니다.");
 				}
 			}
 			
@@ -207,6 +214,35 @@ public class MenuService {
 		 12. map에서 제일 가중치가 높은 메뉴 2개 뽑아와서 choice 테이블에 추가
 		 	 만약 menuName이 비슷하다면 2번째 추천에서 제외
 		 */
+		String nation = "";
+		for(String n : menuReqList.get("nation")) {
+			nation += n + ",";
+		}
+		nation.substring(0, nation.length()-2);
+		
+		String category = "";
+		for(String c : menuReqList.get("category")) {
+			category += c + ",";
+		}
+		category.substring(0, category.length()-2);
+		
+		String keyword = "";
+		for(String k : menuReqList.get("keyword")) {
+			keyword += k + ",";
+		}
+		keyword.substring(0, keyword.length()-2);
+		
+		String soup = "";
+		for(String s : menuReqList.get("soup")) {
+			soup += s + ",";
+		}
+		soup.substring(0, soup.length()-2);
+		
+		System.out.println(nation);
+		System.out.println(category);
+		System.out.println(soup);
+		System.out.println(keyword);
+		
 		List<MenuRes> menuResList = new ArrayList<>();
 		Menu menu = menuResult.get(0).getKey();
 		List<String> menuReasonList = new ArrayList<>();
@@ -214,7 +250,7 @@ public class MenuService {
 			if(menuReason.get(menu.getMenuName()).isEmpty()) break;
 			menuReasonList.add(menuReason.get(menu.getMenuName()).pop());
 		}
-		menuResList.add(new MenuRes(menu, menuReasonList));
+		menuResList.add(new MenuRes(menu, menuReasonList, nation, category, soup, keyword));
 		boolean fin = false;
 		int index = 1;
 		while(!fin) {
@@ -225,7 +261,7 @@ public class MenuService {
 					if(menuReason.get(secondMenu.getMenuName()).isEmpty()) break;
 					menuReasonList.add(menuReason.get(secondMenu.getMenuName()).pop());
 				}
-				menuResList.add(new MenuRes(secondMenu, menuReasonList));
+				menuResList.add(new MenuRes(secondMenu, menuReasonList, nation, category, soup, keyword));
 				break;
 			}
 			Menu secondMenu = menuResult.get(index).getKey();
@@ -235,7 +271,7 @@ public class MenuService {
 					if(menuReason.get(secondMenu.getMenuName()).isEmpty()) break;
 					menuReasonList.add(menuReason.get(secondMenu.getMenuName()).pop());
 				}
-				menuResList.add(new MenuRes(secondMenu, menuReasonList));
+				menuResList.add(new MenuRes(secondMenu, menuReasonList, nation, category, soup, keyword));
 				fin = true;
 			}
 			index++;
