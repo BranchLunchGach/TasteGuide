@@ -53,9 +53,9 @@ jobs:
       # 6. 빌드 파일 복사 (node_modules 제외)
       - name: Copy build files
         run: |
-          # 빌드된 파일만 복사하고 node_modules는 제외
+          # 빌드된 .war 파일만 복사하고 node_modules는 제외
           if [ -d "target" ] && [ "$(ls -A target)" ]; then
-            cp -r target/* .  # target 폴더의 파일만 복사
+            cp target/*.war .  # .war 파일만 복사
             rm -rf target
             # .gitignore 파일을 확인하여 node_modules 폴더가 제외되도록 보장
             echo "node_modules/" >> .gitignore
@@ -73,4 +73,3 @@ jobs:
             git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/BranchLunchGach/TASTEGUDIE-BACK.git deploy --force
           else
             echo "No changes to commit"
-          fi
