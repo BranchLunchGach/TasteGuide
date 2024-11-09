@@ -53,6 +53,10 @@ jobs:
       # 6. 빌드 파일 복사 (node_modules 제외)
       - name: Copy build files
         run: |
+          # target 디렉토리의 파일 출력
+          echo "Listing files in target directory:"
+          ls -l target/  # target 폴더 내용 출력
+
           # 빌드된 .war 파일만 복사
           if [ -d "target" ] && [ "$(ls -A target)" ]; then
             cp target/spring-0.0.1-SNAPSHOT.war .  # 정확한 .war 파일 복사
