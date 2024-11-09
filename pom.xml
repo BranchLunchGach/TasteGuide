@@ -115,7 +115,19 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-mail</artifactId>
 		</dependency>
-
+		
+		<!-- https://mvnrepository.com/artifact/org.json/json -->
+		<dependency>
+		    <groupId>org.json</groupId>
+		    <artifactId>json</artifactId>
+		    <version>20240303</version>
+		</dependency>
+		
+		<!-- RestTemplate 사용을 위해 의존성 추가 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -133,6 +145,13 @@
 				</configuration>
 			</plugin>
 		</plugins>
+		
+		<!-- 프로젝트 빌드 시application-API-KEY.properties를 인식하도록 하기 위해 추가 -->
+		<resources>
+      		<resource>
+        	<directory>src/main/resources</directory>
+      		</resource>
+    	</resources>
 	</build>
 
 </project>

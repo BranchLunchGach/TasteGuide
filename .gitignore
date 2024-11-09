@@ -40,3 +40,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### API KEY ###
+api-keys.properties
