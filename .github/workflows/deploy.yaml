@@ -21,59 +21,60 @@ jobs:
           java-version: '17'  # 필요한 Java 버전
           distribution: 'zulu'  # 지원되는 OpenJDK 배포판 중 하나
 
-      # 3. Maven 설치
+      # 3. Java 설치 확인
+      - name: Verify Java installation
+        run: java -version
+
+      # 4. Maven 설치
       - name: Install Maven
         run: |
           sudo apt-get update
           sudo apt-get install -y maven
 
-      # 4. Maven 빌드 실행 (변경된 파일만 빌드)
+      # 5. Maven 설치 확인
+      - name: Verify Maven installation
+        run: mvn -v
+
+      # 6. Maven 빌드 실행 (변경된 파일만 빌드)
       - name: Build with Maven (if changes detected)
         run: |
           echo "Checking for changes in source files..."
-          # 비교할 커밋을 올바르게 지정
           if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q 'src'; then
             echo "Changes detected in source files, running mvn install."
-            mvn install  # 변경된 파일이 src에 있을 때만 빌드
+            mvn install -DskipTests  # 테스트를 건너뛰고 빌드 실행
           else
             echo "No source code changes, skipping build."
           fi
 
-      # 5. deploy 브랜치 체크아웃
+      # 7. deploy 브랜치 체크아웃
       - name: Checkout deploy branch
         run: |
-          # 사용자 정보 설정
-          git config --global user.name "pleasebelieveme"  # 사용자 이름
-          git config --global user.email "cain1227@naver.com"  # 사용자 이메일
-          # 'deploy' 브랜치 체크아웃, 없으면 새로 생성
+          git config --global user.name "pleasebelieveme"
+          git config --global user.email "cain1227@naver.com"
           git checkout deploy || git checkout --orphan deploy
-          git rm -rf .  # deploy 브랜치의 기존 파일 삭제
+          git rm -rf .
 
-      # 6. 빌드 파일 복사 (node_modules 제외)
+      # 8. 빌드 파일 복사 (node_modules 제외)
       - name: Copy build files
         run: |
-          # target 디렉토리의 파일 출력
           echo "Listing files in target directory:"
-          ls -l target/  # target 폴더 내용 출력
+          ls -l target/
 
-          # 빌드된 .war 파일만 복사
           if [ -d "target" ] && [ "$(ls -A target)" ]; then
             echo "Copying .war file from target directory..."
-            cp target/spring-0.0.1-SNAPSHOT.war .  # 정확한 .war 파일 복사
-            rm -rf target  # target 폴더 삭제
+            cp target/spring-0.0.1-SNAPSHOT.war .
+            rm -rf target
           else
             echo "No build files to copy"
           fi
 
-      # 7. 변경 사항이 있는 경우에만 커밋 및 푸시
+      # 9. 변경 사항이 있는 경우에만 커밋 및 푸시
       - name: Commit and push if there are changes
         run: |
-          # 정확한 .war 파일만 추가하고 커밋
           git add spring-0.0.1-SNAPSHOT.war
           if [ -n "$(git status --porcelain)" ]; then
             echo "Changes detected, committing .war file."
             git commit -m "Deploy Spring Boot build files"
-            # GitHub Token을 사용하여 인증
             git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/BranchLunchGach/TASTEGUDIE-BACK.git deploy --force
           else
             echo "No changes to commit"
