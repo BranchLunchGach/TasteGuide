@@ -1,5 +1,7 @@
 package com.web.spring.dto;
 
+import java.util.Arrays;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,10 +15,9 @@ import lombok.ToString;
 @ToString
 public class MenuReq {
 	private String nation;
-	private String category;
-	private String keyword;
-	private String soup;
-	private String selectName;
+	private String majorCategory;
+	private String concept;
+	
 }
 	
 	
