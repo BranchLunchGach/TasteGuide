@@ -55,7 +55,7 @@ jobs:
         run: |
           # 빌드된 파일만 복사
           if [ -d "target" ] && [ "$(ls -A target)" ]; then
-            cp -r target/* .  # target 폴더의 파일만 복사
+            cp target/*.war .  # .war 파일만 복사
             rm -rf target
           else
             echo "No build files to copy"
