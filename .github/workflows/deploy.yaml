@@ -19,14 +19,14 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: '17'  # 필요한 Java 버전
-          distribution: 'openjdk'  # 배포판 설정 (openjdk)
+          distribution: 'zulu'  # 지원되는 OpenJDK 배포판 중 하나
 
       # 3. Maven 설치 (필요한 Maven 버전)
       - name: Set up Maven
         uses: actions/setup-java@v2
         with:
           java-version: '17'
-          distribution: 'openjdk'
+          distribution: 'zulu'  # 동일한 배포판으로 설정
           maven-version: '3.8.1'  # 필요한 Maven 버전으로 수정
 
       # 4. Maven 빌드 실행 (변경된 파일만 빌드)
