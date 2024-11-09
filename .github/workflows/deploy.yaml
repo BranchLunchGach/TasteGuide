@@ -42,7 +42,7 @@ jobs:
           if [ -z "${{ github.event.before }}" ]; then
             # 첫 푸시 또는 새로운 브랜치일 경우 전체 빌드를 실행
             echo "First push or new branch, running mvn install."
-            mvn clean install -DskipTests
+            mvn install -DskipTests
           else
             # `before` 커밋과 `sha` 커밋을 비교하여 변경된 파일이 src 폴더에 있는지 확인
             if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q 'src'; then
@@ -53,15 +53,19 @@ jobs:
             fi
           fi
 
-      # 7. deploy 브랜치 체크아웃
+      # 7. deploy 브랜치 체크아웃 (deploy 브랜치가 없다면 생성)
       - name: Checkout deploy branch
         run: |
           git config --global user.name "pleasebelieveme"
           git config --global user.email "cain1227@naver.com"
           git checkout deploy || git checkout --orphan deploy  # 'deploy' 브랜치가 없으면 새로 생성
-          git rm -rf .  # deploy 브랜치의 기존 파일 삭제
 
-      # 8. 빌드 파일 복사 (node_modules 제외)
+      # 8. 이전 파일 삭제 (현재는 .war 파일만 남길 것임)
+      - name: Clean deploy branch
+        run: |
+          git rm -rf .  # 기존 파일들을 제거
+
+      # 9. 빌드 파일 복사 (node_modules 제외)
       - name: Copy build files
         run: |
           echo "Listing files in target directory:"
@@ -70,12 +74,11 @@ jobs:
           if [ -d "target" ] && [ "$(ls -A target)" ]; then
             echo "Copying .war file from target directory..."
             cp target/spring-0.0.1-SNAPSHOT.war .
-            rm -rf target  # target 폴더 삭제
           else
             echo "No build files to copy"
           fi
 
-      # 9. 변경 사항이 있는 경우에만 커밋 및 푸시
+      # 10. 변경 사항이 있는 경우에만 커밋 및 푸시
       - name: Commit and push if there are changes
         run: |
           git add spring-0.0.1-SNAPSHOT.war
