@@ -53,10 +53,10 @@ jobs:
       # 6. 빌드 파일 복사 (node_modules 제외)
       - name: Copy build files
         run: |
-          # 빌드된 파일만 복사
+          # 빌드된 .war 파일만 복사
           if [ -d "target" ] && [ "$(ls -A target)" ]; then
             cp target/*.war .  # .war 파일만 복사
-            rm -rf target
+            rm -rf target  # target 폴더 삭제
           else
             echo "No build files to copy"
           fi
@@ -64,7 +64,8 @@ jobs:
       # 7. 변경 사항이 있는 경우에만 커밋 및 푸시
       - name: Commit and push if there are changes
         run: |
-          git add .
+          # .war 파일만 추가하고 커밋
+          git add *.war
           if [ -n "$(git status --porcelain)" ]; then
             git commit -m "Deploy Spring Boot build files"
             # GitHub Token을 사용하여 인증
