@@ -70,12 +70,14 @@ jobs:
         run: |
           echo "Listing files in target directory:"
           ls -l target/
-
+          
           if [ -d "target" ] && [ "$(ls -A target)" ]; then
+            # target 디렉토리 내 .war 파일이 존재하는지 확인
             echo "Copying .war file from target directory..."
             cp target/spring-0.0.1-SNAPSHOT.war .
           else
             echo "No build files to copy"
+            exit 1  # 빌드 파일이 없으면 에러 종료
           fi
 
       # 10. 변경 사항이 있는 경우에만 커밋 및 푸시
