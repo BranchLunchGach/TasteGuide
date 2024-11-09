@@ -32,6 +32,7 @@ public class User {
 	@Column(name = "user_id", unique = true)
 	private String userId;
 	private String password;
+	private String name;
 	private String address;
 	
 	@Enumerated(EnumType.STRING)
@@ -43,12 +44,16 @@ public class User {
 	@Column(name = "birth_date")
 	private LocalDate birthDate;
 	
+	private String role;
+
 	@Override
 	public String toString() {
-		return "User [userNo=" + userNo + ", userId=" + userId + ", password=" + password + ", address=" + address
-				+ ", gender=" + gender + ", phone=" + phone + ", taste=" + taste + ", birthDate="
-				+ birthDate + "]";
+		return "User [userNo=" + userNo + ", userId=" + userId + ", password=" + password + ", name=" + name
+				+ ", address=" + address + ", gender=" + gender + ", phone=" + phone + ", taste=" + taste
+				+ ", birthDate=" + birthDate + ", role=" + role + "]";
 	}
+	
+	
 	
 	
 	
