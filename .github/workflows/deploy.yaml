@@ -33,6 +33,7 @@ jobs:
       - name: Build with Maven (if changes detected)
         run: |
           # 변경된 파일만 빌드
+          echo "Checking for changes in source files..."
           if git diff --name-only $GITHUB_SHA^ $GITHUB_SHA | grep -q 'src'; then
             echo "Changes detected in source files, running mvn install."
             mvn install  # 변경된 파일이 src에 있을 때만 빌드
@@ -59,6 +60,7 @@ jobs:
 
           # 빌드된 .war 파일만 복사
           if [ -d "target" ] && [ "$(ls -A target)" ]; then
+            echo "Copying .war file from target directory..."
             cp target/spring-0.0.1-SNAPSHOT.war .  # 정확한 .war 파일 복사
             rm -rf target  # target 폴더 삭제
           else
@@ -71,6 +73,7 @@ jobs:
           # 정확한 .war 파일만 추가하고 커밋
           git add spring-0.0.1-SNAPSHOT.war
           if [ -n "$(git status --porcelain)" ]; then
+            echo "Changes detected, committing .war file."
             git commit -m "Deploy Spring Boot build files"
             # GitHub Token을 사용하여 인증
             git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/BranchLunchGach/TASTEGUDIE-BACK.git deploy --force
