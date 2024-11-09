@@ -21,20 +21,18 @@ jobs:
           java-version: '17'  # 필요한 Java 버전
           distribution: 'zulu'  # 지원되는 OpenJDK 배포판 중 하나
 
-      # 3. Maven 설치 (필요한 Maven 버전)
-      - name: Set up Maven
-        uses: actions/setup-java@v2
-        with:
-          java-version: '17'
-          distribution: 'zulu'  # 동일한 배포판으로 설정
-          maven-version: '3.8.1'  # 필요한 Maven 버전으로 수정
+      # 3. Maven 설치
+      - name: Install Maven
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y maven
 
       # 4. Maven 빌드 실행 (변경된 파일만 빌드)
       - name: Build with Maven (if changes detected)
         run: |
-          # 변경된 파일만 빌드
           echo "Checking for changes in source files..."
-          if git diff --name-only $GITHUB_SHA^ $GITHUB_SHA | grep -q 'src'; then
+          # 비교할 커밋을 올바르게 지정
+          if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q 'src'; then
             echo "Changes detected in source files, running mvn install."
             mvn install  # 변경된 파일이 src에 있을 때만 빌드
           else
