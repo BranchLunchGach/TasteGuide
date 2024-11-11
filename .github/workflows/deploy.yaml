@@ -3,7 +3,7 @@ name: Build and Deploy
 on:
   push:
     branches:
-      - dev  # 'believeme' 브랜치에 push할 때 트리거
+      - dev  # 'dev' 브랜치에 push할 때 트리거
 
 jobs:
   build:
@@ -70,18 +70,25 @@ jobs:
             git rm -rf .  # 기존 파일 삭제
           fi
 
-      # 7. 변경사항 커밋 및 푸시
-      - name: Commit and push if there are changes
+      # 7. 기존 파일 삭제 (default 파일 제외)
+      - name: Delete old files except default
+        run: |
+          # 모든 파일을 삭제하되, 'default' 파일은 제외
+          git ls-files | grep -v 'default' | xargs git rm -rf
+          git checkout -- default  # 'default' 파일 복원
+
+      # 8. .war 파일 추가 및 푸시
+      - name: Commit and push WAR file
         run: |
           cp target/spring-0.0.1-SNAPSHOT.war .  # 빌드된 .war 파일을 루트 디렉터리로 이동
           git add spring-0.0.1-SNAPSHOT.war       # .war 파일을 Git에 추가
 
           # 변경 사항이 있을 때에만 커밋 및 푸시 수행
           if [ -n "$(git status --porcelain)" ]; then
-            echo "Changes detected, committing .war file."      # 변경 사항이 있어 커밋을 진행
-            git commit -m "Deploy Spring Boot build files"       # 커밋 메시지
+            echo "Changes detected, committing .war file."
+            git commit -m "Deploy Spring Boot build files"
             # GitHub 토큰을 사용하여 deploy 브랜치에 푸시
             git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/BranchLunchGach/TasteGuide.git deploy --force
           else
-            echo "No changes to commit"  # 변경 사항이 없으면 커밋 및 푸시 건너뜀
+            echo "No changes to commit"
           fi
