@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Queue;
 import java.util.Random;
 import java.util.Stack;
 
@@ -15,14 +17,16 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import com.web.spring.api.Crawler;
 import com.web.spring.dto.MenuRes;
 import com.web.spring.entity.Choice;
 import com.web.spring.entity.Menu;
-import com.web.spring.entity.User;
+import com.web.spring.entity.Restaurant;
 import com.web.spring.repository.ChoiceRepository;
 import com.web.spring.repository.MenuRepository;
 import com.web.spring.security.CustomUserDetails;
 
+import io.jsonwebtoken.lang.Arrays;
 import lombok.RequiredArgsConstructor;
 
 @Service
