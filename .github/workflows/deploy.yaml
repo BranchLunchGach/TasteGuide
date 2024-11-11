@@ -70,6 +70,7 @@ jobs:
           else
             git checkout --orphan deploy  # deploy 브랜치가 없으면 새로운 빈 브랜치 생성
             git rm -rf .  # 기존 파일 삭제
+          fi
 
       # 7. 기존 파일 삭제, .war 파일은 제외
       - name: Delete old files, keep WAR file
@@ -92,3 +93,4 @@ jobs:
             git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/BranchLunchGach/TasteGuide.git deploy --force
           else
             echo "No changes to commit"
+          fi
