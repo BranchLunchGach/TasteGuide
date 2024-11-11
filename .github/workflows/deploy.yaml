@@ -43,16 +43,17 @@ jobs:
           echo "Build completed."      # 빌드 완료 메시지
 
       # 5. .war 파일 생성 확인
-      - name: Verify WAR file
+      - name: Verify WAR file location
         run: |
-          # 빌드 성공 여부 확인
+          echo "Checking for .war file in target directory..."
+          # target 디렉터리 내의 파일들 나열
+          ls -l target/  # target 디렉터리 내용 출력
+          # .war 파일 경로 확인
           if [ -f "target/spring-0.0.1-SNAPSHOT.war" ]; then
-            echo "WAR file successfully created"  # .war 파일이 성공적으로 생성되었음을 알림
+            echo "WAR file found at target/spring-0.0.1-SNAPSHOT.war"
           else
-            echo "WAR file not found!"            # .war 파일 생성 실패 시 경고
-            echo "Contents of target directory:"
-            ls -l target/  # target 디렉터리 내용 출력 (디버깅)
-            exit 1         # 오류 코드 반환으로 작업 실패 처리
+            echo "WAR file not found!"
+            exit 1  # 오류 발생 시 종료
           fi
 
       # 6. deploy 브랜치 준비
