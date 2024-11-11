@@ -69,7 +69,7 @@ jobs:
       # 7. .war 파일 추가 및 푸시
       - name: Add and push WAR file
         run: |
-          git add target/spring-0.0.1-SNAPSHOT.war
+          git add -f target/spring-0.0.1-SNAPSHOT.war
           git commit -m "Add WAR file for deployment"
           git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/BranchLunchGach/TasteGuide.git deploy --force
 
