@@ -54,7 +54,6 @@ jobs:
           else
             echo "WAR file not found!"
             exit 1  # 오류 발생 시 종료
-          fi
 
       # 6. deploy 브랜치 준비
       - name: Prepare deploy branch
@@ -70,14 +69,14 @@ jobs:
           else
             git checkout --orphan deploy  # deploy 브랜치가 없으면 새로운 빈 브랜치 생성
             git rm -rf .  # 기존 파일 삭제
-          fi
 
       # 7. 기존 파일 삭제, .war 파일은 제외
       - name: Delete old files, keep WAR file
         run: |
           # 모든 파일을 삭제하되, .war 파일은 제외
-          git ls-files | grep -v 'spring-0.0.1-SNAPSHOT.war' | xargs git rm -f
+          git ls-files | grep -v 'target/spring-0.0.1-SNAPSHOT.war' | xargs -I {} git rm -f {}
           rm -rf * .[^.]*  # 불필요한 파일 삭제
+
           # .war 파일이 있는지 확인하고, 있으면 스테이지에서 제외하지 않도록 설정
           git add target/spring-0.0.1-SNAPSHOT.war
 
@@ -92,4 +91,3 @@ jobs:
             git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/BranchLunchGach/TasteGuide.git deploy --force
           else
             echo "No changes to commit"
-          fi
