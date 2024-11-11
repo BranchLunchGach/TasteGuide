@@ -70,14 +70,7 @@ jobs:
             git rm -rf .  # 기존 파일 삭제
           fi
 
-      # 7. 기존 파일 삭제 (default 파일 제외)
-      - name: Delete old files except default
-        run: |
-          # 모든 파일을 삭제하되, 'default' 파일은 제외
-          git ls-files | grep -v 'default' | xargs git rm -rf
-          git checkout -- default  # 'default' 파일 복원
-
-      # 8. .war 파일 추가 및 푸시
+      # 7. .war 파일 추가 및 푸시
       - name: Commit and push WAR file
         run: |
           cp target/spring-0.0.1-SNAPSHOT.war .  # 빌드된 .war 파일을 루트 디렉터리로 이동
