@@ -63,8 +63,9 @@ jobs:
           git config --global user.email "cain1227@naver.com"
           
           # deploy 브랜치가 존재하는지 확인하고 체크아웃, 없으면 새로 생성
-          if git show-ref --verify --quiet refs/remotes/origin/deploy; then
+          if git rev-parse --verify origin/deploy; then
             git checkout deploy
+            git pull origin deploy  # 최신 커밋 가져오기
           else
             git checkout --orphan deploy  # deploy 브랜치가 없으면 새로운 빈 브랜치 생성
             git rm -rf .  # 기존 파일 삭제
@@ -73,13 +74,15 @@ jobs:
       # 7. 기존 파일 삭제
       - name: Delete old files
         run: |
-          # 모든 파일을 삭제
-          git ls-files | xargs git rm -rf  # 기존 파일 모두 삭제
+          # deploy 브랜치의 모든 파일을 삭제
+          git rm -rf . # 기존 파일 모두 삭제
+          rm -rf * .[^.]*  # 불필요한 파일 삭제
 
       # 8. .war 파일 추가 및 푸시
       - name: Commit and push WAR file
         run: |
-          cp target/spring-0.0.1-SNAPSHOT.war .  # 빌드된 .war 파일을 루트 디렉터리로 이동
+          # 빌드된 .war 파일을 루트 디렉터리로 이동
+          cp target/spring-0.0.1-SNAPSHOT.war .  
           git add spring-0.0.1-SNAPSHOT.war       # .war 파일을 Git에 추가
 
           # 변경 사항이 있을 때에만 커밋 및 푸시 수행
