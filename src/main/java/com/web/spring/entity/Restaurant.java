@@ -27,7 +27,7 @@ public class Restaurant implements Comparable<Restaurant> {
 	private String restauranInfo; //매장 소개
 	private String restauranService; //매장 편의시설 및 서비스
 	
-	private String restauranDistance; //현재 위치와 해당 레스토랑의 거리
+	private int restauranDistance; //현재 위치와 해당 레스토랑의 거리
 	private int score; //가중치
 	
 	@Override

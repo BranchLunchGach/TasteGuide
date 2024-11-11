@@ -5,9 +5,11 @@ import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.web.spring.api.Crawler;
+import com.web.spring.api.MapAPI;
 import com.web.spring.entity.Restaurant;
 
 import io.jsonwebtoken.lang.Arrays;
@@ -15,14 +17,19 @@ import io.jsonwebtoken.lang.Arrays;
 @Service
 public class RestaurantService {
 	
+	@Autowired
+	private MapAPI mapAPI = new MapAPI();
+	
 	// ======================= 식당 3개 추천 기능 =======================
 	public Queue<Restaurant> restaurantRecommend(String menu, String coreKeywords, String mainKeywords) {
 		
 		Queue<Restaurant> pq = new PriorityQueue<>();
+		String startX = "126.9842915";
+		String startY = "37.5697105";
 		
 		// Headless
 		long startTime = System.currentTimeMillis();
-		Crawler crawler = new Crawler(10);
+		Crawler crawler = new Crawler(5);
 		List<String> lists = crawler.reviewCrawling(menu); //String 하나가 가게 하나의 모든 정보..
 		
 		System.out.println("크롤링 데이터 사이즈 : " + lists.size());
@@ -161,12 +168,27 @@ public class RestaurantService {
 			
 			
 			//거리에 따른 가중치 부여
+			String address = mapAPI.getGeocode(datas[3]);
+			String endX = address.split(",")[0];
+			String endY = address.split(",")[1];
+			String strDistance = mapAPI.getLinearDistance(startX, startY, endX, endY);
+			int distance = Integer.parseInt(strDistance);
 			
-			
+			if (distance <= 300) {
+				score += 20;
+			} else if (distance <= 600) {
+				score += 10;
+			} else if (distance <= 1000) {
+				score += 5;
+			} else if (distance <= 2000) {
+				score += 1;
+			} else if (distance > 2000) {
+				score -= 20;
+			}
 			
 			//가중치 로직 끝...
 
-			Restaurant restaurant = new Restaurant(datas[0], datas[1], dayOff, datas[3], datas[4], menus, datas[10], datas[11], datas[12], keywordReviews, datas[23], datas[24], "150", score);
+			Restaurant restaurant = new Restaurant(datas[0], datas[1], dayOff, datas[3], datas[4], menus, datas[10], datas[11], datas[12], keywordReviews, datas[23], datas[24], distance, score);
 			
 			pq.add(restaurant);
 		}

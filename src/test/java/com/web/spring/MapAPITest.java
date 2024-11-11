@@ -11,6 +11,7 @@ import com.web.spring.api.MapAPI;
 
 @SpringBootTest
 public class MapAPITest {
+	
 	@Autowired
 	private MapAPI mapAPI;
 	
@@ -18,6 +19,9 @@ public class MapAPITest {
     void testGetGeocode() {
         String result = mapAPI.getGeocode("우정국로 2길 21");
         System.out.println("Geocode result: " + result);
+        String[] result2 = result.split(",");
+        System.out.println("x : " + result2[0]);
+        System.out.println("y : " + result2[1]);
         assertNotNull(result); // 결과가 null이 아니어야 합니다.
         assertFalse(result.contains("오류")); // 오류 메시지가 포함되지 않아야 합니다.
     }

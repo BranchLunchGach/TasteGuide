@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.web.spring.api.MapAPI;
 import com.web.spring.dto.RestaurantReq;
 import com.web.spring.entity.Restaurant;
 import com.web.spring.service.RestaurantService;
@@ -21,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 public class RestaurantController {
 	
 	private final RestaurantService restaurantService;
+	private final MapAPI mapAPI;
 	private Queue<Restaurant> pq = new PriorityQueue<>();
 	
 	@PostMapping("/restaurant")

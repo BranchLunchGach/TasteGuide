@@ -71,12 +71,7 @@ public class MapAPI {
 
             if (arr.length() > 0) {
                 JSONObject temp = (JSONObject) arr.get(0);
-                return new JSONObject()
-                    .put("roadAddress", temp.get("roadAddress"))
-                    .put("jibunAddress", temp.get("jibunAddress"))
-                    .put("latitude", temp.get("y"))
-                    .put("longitude", temp.get("x"))
-                    .toString();
+                return temp.get("x") + "," +  temp.get("y");
             } else {
                 return "주소를 찾을 수 없습니다.";
             }
@@ -157,7 +152,6 @@ public class MapAPI {
 
             // 응답을 String으로 변환하여 파싱
             String responseString = response.toString();  // 응답을 String으로 받기
-            System.out.println(responseString);  // 응답을 콘솔에 출력하여 확인
 
             JSONTokener tokener = new JSONTokener(responseString);  // 응답을 JSONTokener로 변환
             JSONObject object = new JSONObject(tokener);  // JSONObject로 파싱
