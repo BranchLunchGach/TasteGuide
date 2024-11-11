@@ -66,26 +66,22 @@ jobs:
             git checkout --orphan deploy  # 새로운 빈 브랜치 생성
           fi
 
-      # 7. 기존 파일 삭제, .war 파일은 제외
-      - name: Delete old files, keep WAR file
+      # 7. .war 파일 추가 및 푸시
+      - name: Add and push WAR file
         run: |
-          # 기존 파일을 모두 삭제하되, .war 파일만 남기기
-          ls -al
-          git ls-files | grep -v 'target/spring-0.0.1-SNAPSHOT.war' | xargs -I {} git rm -f {}
+          git add target/spring-0.0.1-SNAPSHOT.war
+          git commit -m "Add WAR file for deployment"
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/BranchLunchGach/TasteGuide.git deploy --force
 
+      # 8. 기존 파일 삭제 및 최종 푸시
+      - name: Delete old files and push final state
+        run: |
+          # .war 파일을 제외한 모든 파일 삭제
+          git ls-files | grep -v 'target/spring-0.0.1-SNAPSHOT.war' | xargs -I {} git rm -f {}
+          
           # .git 폴더와 관련된 중요한 파일을 삭제하지 않도록
-          ls -al
           git clean -fdx  # Git 트래킹하지 않는 파일을 안전하게 삭제
 
-          # .war 파일이 Git 트래킹에 포함되어 있는지 확인 후 추가
-          if ! git ls-files --error-unmatch target/spring-0.0.1-SNAPSHOT.war > /dev/null 2>&1; then
-            git add target/spring-0.0.1-SNAPSHOT.war
-          fi
-
-      # 8. .war 파일 무조건 커밋하고 푸시
-      - name: Force commit and push WAR file
-        run: |
-          # .war 파일 강제로 커밋하고 푸시
-          git add target/spring-0.0.1-SNAPSHOT.war
-          git commit -m "Force deploy Spring Boot build files"
+          # 최종 삭제 상태를 커밋하고 푸시
+          git commit -m "Clean up files, keep only WAR file"
           git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/BranchLunchGach/TasteGuide.git deploy --force
