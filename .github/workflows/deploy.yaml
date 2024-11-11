@@ -54,6 +54,7 @@ jobs:
           else
             echo "WAR file not found!"
             exit 1  # 오류 발생 시 종료
+		  fi
 
       # 6. deploy 브랜치 준비
       - name: Prepare deploy branch
