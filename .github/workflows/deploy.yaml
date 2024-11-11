@@ -76,11 +76,8 @@ jobs:
           git add spring-0.0.1-SNAPSHOT.war       # .war 파일을 Git에 추가
 
           # 변경 사항이 있을 때에만 커밋 및 푸시 수행
-          if [ -n "$(git status --porcelain)" ]; then
-            echo "Changes detected, committing .war file."
-            git commit -m "Deploy Spring Boot build files"
-            # GitHub 토큰을 사용하여 deploy 브랜치에 푸시
-            git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/BranchLunchGach/TasteGuide.git deploy --force
-          else
-            echo "No changes to commit"
-          fi
+          git status --porcelain
+          git diff --cached
+          git commit -m "Deploy Spring Boot build files"
+          # 강제로 푸시
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/BranchLunchGach/TasteGuide.git deploy --force
