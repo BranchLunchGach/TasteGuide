@@ -71,9 +71,10 @@ jobs:
           rm -rf target
           ls -al
 
-      # 8. .war 파일 무조건 커밋하고 푸시
-      - name: Force commit and push WAR file
+      # 8. Git LFS로 WAR 파일 추가 및 푸시
+      - name: Force commit and push WAR file with Git LFS
         run: |
-          git add spring-0.0.1-SNAPSHOT.war
-          git commit -m "Force deploy Spring Boot build files"
+          git lfs track "spring-0.0.1-SNAPSHOT.war"
+          git add .gitattributes spring-0.0.1-SNAPSHOT.war
+          git commit -m "Force deploy Spring Boot build files with Git LFS"
           git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/BranchLunchGach/TasteGuide.git deploy --force
