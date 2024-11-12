@@ -17,4 +17,6 @@ public class RestaurantReq {
 	private String menu;
 	private String coreKeyword;
 	private String mainKeyword;
+	private String avgX;
+	private String avgY;
 }
