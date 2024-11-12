@@ -7,6 +7,8 @@
 
 # application.properties (exclude from version control)
 application.properties
+#env file
+.env
 
 # Build directories
 target/

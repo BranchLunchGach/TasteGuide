@@ -20,6 +20,7 @@ import com.web.spring.security.CustomUserDetails;
 import com.web.spring.service.UserService;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,10 +33,10 @@ public class UserController {
 	@PostMapping("/users")
 	public ResponseEntity<?> signUp(@RequestBody User user) {
 		log.info("user signUp==>",user);
-		userService.signUp(user);
+		User rUser = userService.signUp(user);
 		return ResponseEntity
 						.status(201)
-							.body("Register OK~~!!");
+							.body(rUser);
 	}
 	//duplicateCheck
 		@GetMapping("/users/{id}")
@@ -89,5 +90,6 @@ public class UserController {
 						.body(result);
 		}
 	}
+	
 	
 }

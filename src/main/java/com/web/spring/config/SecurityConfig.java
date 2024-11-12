@@ -51,7 +51,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         log.info("SecurityFilterChain filterChain(HttpSecurity http) call.....");
-       /////////////////////////////////
+     
         //CORS 설정
         http.cors((corsCustomizer ->
                         corsCustomizer.configurationSource(new CorsConfigurationSource()
@@ -70,7 +70,7 @@ public class SecurityConfig {
                                 return configuration;
                             }
                         })));
-       ////////////////////////////////////
+      
         //csrf disable
         http.csrf((auth) -> auth.disable()); //csrf공격을 방어하기 위한 토큰 주고 받는 부분을 비활성화!
 
@@ -84,7 +84,8 @@ public class SecurityConfig {
         //경로별 인가 작업
         http.authorizeHttpRequests((auth) ->
                 auth
-                        .requestMatchers("/menu", "/users", "/users/**", "/boards","/mail","/findId","/updatePass", "/restaurant").permitAll()
+                        .requestMatchers("/menu", "/users", "/users/**", "/boards","/mail","/findId","/updatePass","auth/google/code","auth/google/token", "/restaurant").permitAll()
+
                         .requestMatchers("/swagger-ui", "/swagger-ui/**","/api/logistics","/api/swagger-config","/v3/api-docs/**").permitAll()
                         .requestMatchers("/admin").hasRole("ADMIN")
                         .anyRequest().authenticated()
