@@ -29,7 +29,7 @@ public class RestaurantService {
 		
 		// Headless
 		long startTime = System.currentTimeMillis();
-		Crawler crawler = new Crawler(5);
+		Crawler crawler = new Crawler(10);
 		List<String> lists = crawler.reviewCrawling(menu); //String 하나가 가게 하나의 모든 정보..
 		
 		System.out.println("크롤링 데이터 사이즈 : " + lists.size());
@@ -201,6 +201,67 @@ public class RestaurantService {
 		
 		return pq;
 	} // ======================= 식당 3개 추천 기능 =======================
+	
+	// ======================= 만남의 장소 식당 3개 추천 기능 =======================
+		public Queue<Restaurant> helloRecommend(String menu, String avgX, String avgY) {
+			
+			Queue<Restaurant> pq = new PriorityQueue<>();
+
+			Crawler crawler = new Crawler(10);
+			List<String> lists = crawler.hello(menu, avgX, avgY); //String 하나가 가게 하나의 모든 정보..
+						
+			// 크롤링한 데이터로 Restaurant 객체 생성
+			for (String data : lists) {
+				
+				System.out.println(data);
+				
+				String[] datas = data.split("}");
+				System.out.println("split 지났씁니다~");				
+				
+				boolean dayOff = false;
+				int score = 0;
+				List<String> menus = new ArrayList<>();
+				List<String> keywordReviews = new ArrayList<>();
+				List<Integer> keywordReviewCnts = new ArrayList<>();
+				
+				//메뉴 5가지 저장
+				for (int i = 5; i <= 9; i++)
+					menus.add(datas[i]);
+				System.out.println("메뉴 저장 지났씁니다~");			
+				
+				//키워드 리뷰 10개 저장 (13~22)
+				if (!datas[13].equals("0")) {
+					for (int i = 13; i<=22; i++) {
+						String[] str = datas[i].replaceAll("\"", "").replaceAll(" ", "").split(",");
+						keywordReviews.add(str[0]);
+						keywordReviewCnts.add(Integer.parseInt(str[1])); //해당 키워드를 입력한 사람의 수를 대입
+					}
+				} else {
+					for (int i = 13; i<=22; i++) {
+						keywordReviews.add("0");
+					}
+				}
+				System.out.println("키워드 리뷰 저장 지났씁니다~");
+				
+				//가중치 로직 시작...
+				if(datas[2].equals("오늘 휴무")) {
+					dayOff = true;
+					score -= 4000000;
+				}
+				
+				System.out.println("리뷰 개수 구하기 전!");
+				int totalReviewCnt = Integer.parseInt(datas[11]) + Integer.parseInt(datas[12]);
+				score += totalReviewCnt;
+
+				Restaurant restaurant = new Restaurant(datas[0], datas[1], dayOff, datas[3], datas[4], menus, datas[10], datas[11], datas[12], keywordReviews, datas[23], datas[24], 0, score);
+				
+				pq.add(restaurant);
+			}
+						
+			crawler.close();
+			
+			return pq;
+		} // ======================= 만남의장소 식당 3개 추천 기능 =======================
 	
 	
 	private int reviewScore(String keyword, List<String> keywordReviews, List<Integer> keywordReviewCnts, int keywordReviewCnt) {
