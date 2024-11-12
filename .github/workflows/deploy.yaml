@@ -3,81 +3,77 @@ name: Build and Deploy
 on:
   push:
     branches:
-      - dev  # 'dev' 브랜치에 push할 때 트리거
+      - dev
 
 jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: write  # 'contents' 권한을 'write'로 설정하여 푸시 권한 부여
+      contents: write
 
     steps:
-      # 1. 리포지토리 체크아웃
+      # 1. 리포지토리 체크아웃 (Git LFS 활성화)
       - name: Checkout Repository
         uses: actions/checkout@v2
         with:
-          fetch-depth: 0  # 전체 히스토리를 가져와서 변경 사항 비교가 가능하도록 설정
+          fetch-depth: 0
+          lfs: true  # Git LFS 활성화
 
       # 2. Java와 Maven 설치
       - name: Set up Java and Maven
         uses: actions/setup-java@v2
         with:
-          java-version: '17'         # Java 17 설치
-          distribution: 'zulu'       # OpenJDK 배포판 Zulu 사용
-          maven-version: '3.9.9'     # 로컬과 동일한 Maven 버전 지정
-          cache: 'maven'             # Maven 의존성 캐싱
+          java-version: '17'
+          distribution: 'zulu'
+          maven-version: '3.9.9'
+          cache: 'maven'
 
       # 3. Java와 Maven 설치 확인
       - name: Verify Java and Maven installation
         run: |
-          echo "Java version:"        # Java 설치 확인
+          echo "Java version:"
           java -version
-          echo "Maven version:"       # Maven 설치 확인
+          echo "Maven version:"
           mvn -v
 
       # 4. Maven 빌드 실행
       - name: Build with Maven
         run: |
-          echo "Running mvn clean install to build project..."   # 빌드 실행 시작 알림
-          mvn clean install -DskipTests  # 소스 코드 빌드 및 .war 파일 생성
-          echo "Build completed."      # 빌드 완료 메시지
+          echo "Running mvn clean install to build project..."
+          mvn clean install -DskipTests
+          echo "Build completed."
 
       # 5. .war 파일 생성 확인
       - name: Verify WAR file location
         run: |
           echo "Checking for .war file in target directory..."
-          ls -l target/  # target 디렉터리 내용 출력
+          ls -l target/
           if [ -f "target/spring-0.0.1-SNAPSHOT.war" ]; then
             echo "WAR file found at target/spring-0.0.1-SNAPSHOT.war"
           else
             echo "WAR file not found!"
-            exit 1  # 오류 발생 시 종료
+            exit 1
           fi
 
       # 6. deploy 브랜치 체크아웃
       - name: Checkout deploy branch
         run: |
-          # 사용자 정보 설정
-          git config --global user.name "pleasebelieveme"  # 사용자 이름
-          git config --global user.email "cain1227@naver.com"  # 사용자 이메일
-          # 'deploy' 브랜치 체크아웃, 없으면 새로 생성
+          git config --global user.name "pleasebelieveme"
+          git config --global user.email "cain1227@naver.com"
           git checkout deploy || git checkout --orphan deploy
-          git rm -rf .  # deploy 브랜치의 기존 파일 삭제
-          
+          git rm -rf .
+
       # 7. 기존 파일 삭제, .war 파일은 제외
       - name: Delete old files, keep WAR file
         run: |
-          # 기존 파일을 모두 삭제하되, .war 파일만 남기기
           ls -al
-          cp -r target/spring-0.0.1-SNAPSHOT.war . # .war파일만 복사
-          rm -rf target  # 타겟 폴더 삭제
-          # .git 폴더와 관련된 중요한 파일을 삭제하지 않도록
+          cp -r target/spring-0.0.1-SNAPSHOT.war .
+          rm -rf target
           ls -al
 
       # 8. .war 파일 무조건 커밋하고 푸시
       - name: Force commit and push WAR file
         run: |
-          # .war 파일 강제로 커밋하고 푸시
           git add spring-0.0.1-SNAPSHOT.war
           git commit -m "Force deploy Spring Boot build files"
           git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/BranchLunchGach/TasteGuide.git deploy --force
