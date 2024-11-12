@@ -19,7 +19,7 @@ public class CustomUserDetails implements UserDetails{
 	
 	public CustomUserDetails(User user) {
 		this.user = user;
-		log.info("CustomMemberDetails() ===> user { }",user);
+		log.info("CustomMemberDetails() ===> user= "+user);
 
 	}
 	

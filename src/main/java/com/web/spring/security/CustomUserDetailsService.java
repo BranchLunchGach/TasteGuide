@@ -3,6 +3,7 @@ package com.web.spring.security;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.web.spring.entity.User;
@@ -24,10 +25,13 @@ public class CustomUserDetailsService implements UserDetailsService{
 	User user = userRepository.findByUserId(username);
 	log.info("user="+user);
 	if(user != null) {
+		
 		log.info("user not null ....user = "+user);
 		return new CustomUserDetails(user);
+	}else {
+		log.info("user is null");
+		return null;
 	}
-	return null;
 	}
 
 }

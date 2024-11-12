@@ -5,6 +5,8 @@
 *.log
 #application.properties
 application.properties
+#env file
+.env
 
 
 HELP.md

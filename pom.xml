@@ -115,6 +115,22 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-mail</artifactId>
 		</dependency>
+		<!-- 구글 로그인 관련 -->
+		<dependency>
+	     <groupId>com.google.api-client</groupId>
+	     <artifactId>google-api-client</artifactId>
+	     <version>1.32.1</version>
+	  	</dependency>
+	  	<dependency>
+		    <groupId>com.auth0</groupId>
+		    <artifactId>java-jwt</artifactId>
+		    <version>4.2.1</version>
+		</dependency>
+		<dependency>
+	        <groupId>io.github.cdimascio</groupId>
+	        <artifactId>java-dotenv</artifactId>
+	        <version>5.2.2</version> <!-- 최신 버전으로 변경 가능 -->
+	    </dependency>
 
 	</dependencies>
 
