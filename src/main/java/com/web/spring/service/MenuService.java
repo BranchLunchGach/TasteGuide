@@ -152,14 +152,14 @@ public class MenuService {
 			
 			for(int i = 0; i < menuReqList.get("soup").size(); i++) {
 				switch (menuReqList.get("soup").get(i)) {
-					case "true": {				
+					case "있음": {				
 						if(menu.isSoup()) {
 							weight += 11;
 							reasons.push("국물이 있는 메뉴입니다.");
 						}
 						break;
 					}
-					case "false": {				
+					case "없음": {				
 						if(!menu.isSoup()) {
 							weight += 11;
 							reasons.push("국물이 없는 메뉴입니다.");
