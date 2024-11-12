@@ -51,7 +51,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         log.info("SecurityFilterChain filterChain(HttpSecurity http) call.....");
-       /////////////////////////////////
+     
         //CORS 설정
         http.cors((corsCustomizer ->
                         corsCustomizer.configurationSource(new CorsConfigurationSource()
@@ -59,7 +59,7 @@ public class SecurityConfig {
                             @Override
                             public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
                                 CorsConfiguration configuration = new CorsConfiguration();
-                                configuration.setAllowedOrigins(Collections.singletonList("http://localhost:3000"));
+                                configuration.setAllowedOrigins(Collections.singletonList("http://52.78.178.50:3000"));
                                 configuration.setAllowedMethods(Collections.singletonList("*"));
                                 configuration.setAllowCredentials(true);
 
@@ -70,7 +70,7 @@ public class SecurityConfig {
                                 return configuration;
                             }
                         })));
-       ////////////////////////////////////
+      
         //csrf disable
         http.csrf((auth) -> auth.disable()); //csrf공격을 방어하기 위한 토큰 주고 받는 부분을 비활성화!
 
@@ -84,7 +84,8 @@ public class SecurityConfig {
         //경로별 인가 작업
         http.authorizeHttpRequests((auth) ->
                 auth
-                        .requestMatchers("/menu", "/users", "/users/**", "/boards","/mail","/findId","/updatePass","auth/google/code","auth/google/token").permitAll()
+                        .requestMatchers("/menu", "/users", "/users/**", "/boards","/mail","/findId","/updatePass","auth/google/code","auth/google/token", "/restaurant").permitAll()
+
                         .requestMatchers("/swagger-ui", "/swagger-ui/**","/api/logistics","/api/swagger-config","/v3/api-docs/**").permitAll()
                         .requestMatchers("/admin").hasRole("ADMIN")
                         .anyRequest().authenticated()
@@ -95,7 +96,7 @@ public class SecurityConfig {
 
         //필터 추가 LoginFilter()는 인자를 받음 (AuthenticationManager()
         //메소드에 authenticationConfiguration 객체를 넣어야 함)
-       //addFilterAt 은 UsernamePasswordAuthenticationFilter 의 자리에 LoginFilter 가 실행되도록 설정하는 것
+        //addFilterAt 은 UsernamePasswordAuthenticationFilter 의 자리에 LoginFilter 가 실행되도록 설정하는 것
         //JWTFilter 등록
         http.addFilterBefore(new JWTFilter(jwtUtil), LoginFilter.class);
         http.addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil), UsernamePasswordAuthenticationFilter.class);

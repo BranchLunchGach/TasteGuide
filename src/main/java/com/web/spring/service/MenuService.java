@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Queue;
 import java.util.Random;
 import java.util.Stack;
 
@@ -15,14 +17,16 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import com.web.spring.api.Crawler;
 import com.web.spring.dto.MenuRes;
 import com.web.spring.entity.Choice;
 import com.web.spring.entity.Menu;
-import com.web.spring.entity.User;
+import com.web.spring.entity.Restaurant;
 import com.web.spring.repository.ChoiceRepository;
 import com.web.spring.repository.MenuRepository;
 import com.web.spring.security.CustomUserDetails;
 
+import io.jsonwebtoken.lang.Arrays;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -83,6 +87,8 @@ public class MenuService {
 		 10. (5차 필터링) 키워드 따라 가중치 부여 - 일치하면 가중치+11
 		 			   가중치가 추가되면 이유 map에 키워드에 대한 이유 추가
 		 */
+	
+		
 		Calendar cal = Calendar.getInstance();
 		int month = cal.get(Calendar.MONTH);
 		int hour = cal.get(Calendar.HOUR_OF_DAY);
@@ -194,6 +200,15 @@ public class MenuService {
 				reasons.push(time + "에 어울리는 메뉴입니다.");
 			}
 			
+			for(String weather : menuReqList.get("weather")) {
+				if(menu.getWeather().equals(weather)) {
+					weight += 6;
+					reasons.push(weather + "에 어울리는 메뉴입니다.");
+				} else if(menu.getTime().equals("전체")) {
+					weight += 4;
+					reasons.push(weather + "에 어울리는 메뉴입니다.");
+				}
+			}
 			
 			menuMap.put(menu, weight);
 			menuReason.put(menu.getMenuName(), reasons);
@@ -209,7 +224,6 @@ public class MenuService {
 	            return new Random().nextInt(2) * 2 - 1;  // 같은 값일 경우 랜덤 정렬
 	        }
 		}));
-		menuResult.forEach((menu)->System.out.println(menu.getKey().getMenuName() + ", " + menu.getKey().getCategory() + ", " + menu.getValue()));
 		/*
 		 12. map에서 제일 가중치가 높은 메뉴 2개 뽑아와서 choice 테이블에 추가
 		 	 만약 menuName이 비슷하다면 2번째 추천에서 제외
@@ -237,11 +251,6 @@ public class MenuService {
 			soup += s + ",";
 		}
 		soup.substring(0, soup.length()-2);
-		
-		System.out.println(nation);
-		System.out.println(category);
-		System.out.println(soup);
-		System.out.println(keyword);
 		
 		List<MenuRes> menuResList = new ArrayList<>();
 		Menu menu = menuResult.get(0).getKey();

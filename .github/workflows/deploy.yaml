@@ -1,0 +1,80 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      # 1. 리포지토리 체크아웃 (Git LFS 활성화)
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          lfs: true  # Git LFS 활성화
+
+      # 2. Java와 Maven 설치
+      - name: Set up Java and Maven
+        uses: actions/setup-java@v2
+        with:
+          java-version: '17'
+          distribution: 'zulu'
+          maven-version: '3.9.9'
+          cache: 'maven'
+
+      # 3. Java와 Maven 설치 확인
+      - name: Verify Java and Maven installation
+        run: |
+          echo "Java version:"
+          java -version
+          echo "Maven version:"
+          mvn -v
+
+      # 4. Maven 빌드 실행
+      - name: Build with Maven
+        run: |
+          echo "Running mvn clean install to build project..."
+          mvn clean install -DskipTests
+          echo "Build completed."
+
+      # 5. .war 파일 생성 확인
+      - name: Verify WAR file location
+        run: |
+          echo "Checking for .war file in target directory..."
+          ls -l target/
+          if [ -f "target/spring-0.0.1-SNAPSHOT.war" ]; then
+            echo "WAR file found at target/spring-0.0.1-SNAPSHOT.war"
+          else
+            echo "WAR file not found!"
+            exit 1
+          fi
+
+      # 6. deploy 브랜치 체크아웃
+      - name: Checkout deploy branch
+        run: |
+          git config --global user.name "pleasebelieveme"
+          git config --global user.email "cain1227@naver.com"
+          git checkout deploy || git checkout --orphan deploy
+          git rm -rf .
+
+      # 7. 기존 파일 삭제, .war 파일은 제외
+      - name: Delete old files, keep WAR file
+        run: |
+          ls -al
+          cp -r target/spring-0.0.1-SNAPSHOT.war .
+          rm -rf target
+          ls -al
+
+      # 8. Git LFS로 WAR 파일 추가 및 푸시
+      - name: Force commit and push WAR file with Git LFS
+        run: |
+          git lfs track "spring-0.0.1-SNAPSHOT.war"
+          git add .gitattributes spring-0.0.1-SNAPSHOT.war
+          git commit -m "Force deploy Spring Boot build files with Git LFS"
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/BranchLunchGach/TasteGuide.git deploy --force
