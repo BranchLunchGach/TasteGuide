@@ -49,6 +49,43 @@ public class Crawler {
 	    	sb = new StringBuilder();
 	    	WebDriverManager.chromedriver().setup();  
 	    }
+	    
+	    public List<String> hello(String menu, String x, String y) {	        
+	        
+	    	try {
+	        	// 네이버 지도 페이지로 접속
+		        driver.get("https://map.naver.com");
+				
+				 // JavaScript로 검색어를 입력
+		        WebElement searchBox = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("input.input_search")));
+		        searchBox.sendKeys(y + "," + x);
+		        searchBox.sendKeys(Keys.ENTER);
+		        System.out.println("위치 변경 완료..");
+		        
+				Thread.sleep(2000);
+				
+		        searchBox.sendKeys(menu);
+		        searchBox.sendKeys(Keys.ENTER);
+		        
+		        System.out.println("검색 완료");
+		        
+		        Thread.sleep(2000);
+
+		        JavascriptExecutor js = (JavascriptExecutor) driver;
+		        while (!(Boolean) js.executeScript("return document.querySelector('iframe#searchIframe') !== null;")) {
+		            System.out.println("iframe이 아직 로드되지 않았습니다...");
+		            Thread.sleep(500); // 짧은 시간 대기 후 반복 확인
+		        }
+		        driver.switchTo().frame("searchIframe");
+		        
+		        return reviewCrawlin2(menu);
+
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+	    	
+	    	return null;
+	    }
 		
 		public List<String> reviewCrawling(String keyword) { 
 			
@@ -57,12 +94,134 @@ public class Crawler {
 	            
 	            // JavaScript로 검색어를 입력
 	        	keywordSearch(driver, wait, keyword);    
-	        	//System.out.println("Iframe 전환 완료!");
 	            
 	            // 가게 이름 요소를 두 가지 경우에 맞게 찾기
 	            List<WebElement> shopLinks = wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.cssSelector("div>.place_bluelink>.TYaxT, div.place_bluelink.C6RjW > span.YwYLL")));
 	            
 	           //System.out.println("가게를 찾았다!");
+	                        
+	            //가게들의 리뷰들을 담을 컬렉션
+	            List<String> infos = new ArrayList<>();
+
+	            // 최대 2개의 상세 페이지 URL 가져오기
+	            for (int i = 0; i < Math.min(count, shopLinks.size()); i++) {
+	                WebElement shop = shopLinks.get(i);
+	                
+	                WebElement shopType = driver.findElement(By.cssSelector("span.KCMnt"));
+	                System.out.println(shop.getText()); //매장 이름
+	                
+	                //sb.append("[매장 이름] : " + shop.getText()).append("\n");
+	                //sb.append("[매장 타입] : " + shopType.getText()).append("\n");
+	                sb.append(shop.getText()).append("}");
+	                sb.append(shopType.getText()).append("}");
+	                
+	                detailPageActiveCheck(driver, shop);
+	                
+	                frameChangeByEntryIframe(driver, wait);
+	                
+	                List<WebElement> times = driver.findElements(By.cssSelector(".A_cdD>em"));
+	                if(!times.isEmpty()) {
+	                	String time = times.get(0).getText();
+	                	if(time.equals("오늘 휴무")) sb.append("오늘 휴무").append("}");
+	                	else  sb.append("0").append("}");
+	                	
+	                }
+	                
+	                //주소 및 위치 가져와 보기.
+	                WebElement address = driver.findElement(By.cssSelector("span.LDgIH"));
+	                //sb.append("[매장 주소] : " + address.getText()).append("\n");
+	                sb.append(address.getText()).append("}");
+	                
+	                try {
+	                    WebElement location = driver.findElement(By.cssSelector("div.nZapA"));
+	                    // 요소가 있는 경우 텍스트를 가져와 출력
+	                    //sb.append("[매장 위치] : " + location.getText().replace("미터", "")).append("\n");
+	                    sb.append(location.getText().replace("\n", " ").replace("미터", "")).append("}");
+	                } catch (NoSuchElementException e) {
+	                    // 요소가 없는 경우 "주소 미작성" 출력
+	                	//sb.append("[매장 위치] : 주소 미작성").append("\n");
+	                	sb.append("0").append("}");
+	                }
+	                
+	                // ======================== 메뉴 탭 클릭 부분 ========================
+	                WebElement menuTab = getTab(driver, "메뉴");         
+	                
+	                // 메뉴 탭 클릭 및 활성화 확인
+	                try {
+	                	tabClickAndActiveCheck(driver, menuTab);
+	                } catch (StaleElementReferenceException e) {
+	                	System.out.println("불가피하게 종료...");
+	                	sb.setLength(0);
+	                	frameChange(driver, wait, "searchIframe");
+	                	continue;
+	                }
+	                
+	                String menus = menuCrawling(driver);
+	                sb.append(menus);                         
+	                
+	                // ======================== 리뷰 탭 클릭 부분 ========================
+	                WebElement reviewTab = getTab(driver, "리뷰");         
+	                
+	                // 리뷰 탭 클릭 및 활성화 확인
+	                tabClickAndActiveCheck(driver, reviewTab);     
+	                
+	                // 별점 및 총 리뷰(블로그 리뷰, 방문자 리뷰) 개수 가져오기.
+	                List<WebElement> reviewTotalCnt = driver.findElements(By.cssSelector("span.PXMot"));
+	                String reviewTotal = "";
+	                
+	                if(reviewTotalCnt.size() == 3) {
+	                	for (WebElement reviewCnt : reviewTotalCnt) {
+	                    	String review = reviewCnt.getText().replaceAll("[^0-9]", "");
+	                    	sb.append(review).append("}");
+	                    }
+	                } else {
+	                	sb.append("0").append("}");
+	                	for (WebElement reviewCnt : reviewTotalCnt) {
+	                    	String review = reviewCnt.getText().replaceAll("[^0-9]", "");
+	                    	sb.append(review).append("}");
+	                    }
+	                }              
+
+	                List<String> keywordReviews = reviewRecommendKeyword(driver);
+	                for(String keywordReview : keywordReviews) 
+	                	sb.append(keywordReview).append("}");
+	                                
+	                // ======================== 정보 탭 클릭 부분 ========================
+	                WebElement infoTab = getTab(driver, "정보");  
+	                
+	                if(infoTab != null) {
+	                	tabClickAndActiveCheck(driver, infoTab);
+	                    
+	                    String info = infoCrawling(driver);
+	                    String service = restaurantServiceCrawling(driver);
+//	                    sb.append("[매장 소개] : " + info).append("\n");
+//	                    sb.append("[매장 서비스] : " + service).append("\n");
+	                    sb.append(info).append("}");
+	                    sb.append(service).append("}");
+	                } else {
+	                	sb.append("0").append("}");
+	                	sb.append("0").append("}");
+	                }
+	                                
+	                frameChange(driver, wait, "searchIframe");
+	                
+	                infos.add(sb.toString());
+	                sb.setLength(0);
+	            }
+	            return infos;
+	            
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        } 
+	        
+	        return null;
+	    }
+		
+		public List<String> reviewCrawlin2(String keyword) { 
+			
+	        try {     	           	            
+	            // 가게 이름 요소를 두 가지 경우에 맞게 찾기
+	            List<WebElement> shopLinks = wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.cssSelector("div>.place_bluelink>.TYaxT, div.place_bluelink.C6RjW > span.YwYLL")));
 	                        
 	            //가게들의 리뷰들을 담을 컬렉션
 	            List<String> infos = new ArrayList<>();
@@ -272,7 +431,8 @@ public class Crawler {
 	    	List<String> menu = new ArrayList<>();
 	    	List<WebElement> allMenuElements = driver.findElements(By.cssSelector(".E2jtL, li.order_list_item"));
 	    	StringBuilder sb = new StringBuilder();
-	    	int count = 1;
+	    	int count = 0;
+	    	String imgUrl = "0"; // 기본 값 설정
 	    	
 	    	System.out.println("allMenuElements...");
 	    	
@@ -282,8 +442,6 @@ public class Crawler {
 	    	System.out.println("가져온 메뉴 수: " + menuElements.size());
 	    	
 	    	for (WebElement w : menuElements) {
-	        	//String imgUrl = w.findElement(By.cssSelector(".YBmM2 img, .img_box img")).getDomAttribute("src");
-	        	String imgUrl = "이미지 없음"; // 기본 값 설정
 
 	        	List<WebElement> imgElements = w.findElements(By.cssSelector(".YBmM2 img, .img_box img"));
 
@@ -291,17 +449,16 @@ public class Crawler {
 	        	    imgUrl = imgElements.get(0).getDomAttribute("src");
 	        	}
 
-	        	//System.out.println("이미지 URL: " + imgUrl);
-	        	
 	        	String name = w.findElement(By.cssSelector(".lPzHi, .info_detail>.tit")).getText();	            
 	        	String price = w.findElement(By.cssSelector(".GXS1X, .price")).getText();
-	        	
-//	        	sb.append("[음식" + count +" 이미지] : " + imgUrl).append("\n");
-//	        	sb.append("[음식" + count +" 이름] : " + name).append("\n");
-//	        	sb.append("[음식" + count +" 가격] : " + price).append("\n\n");
+
 	        	sb.append(imgUrl + "]" + name + "]" + price).append("}");
 	        	count++;
 	        }
+	    	
+	    	for (int i = 0; i < (5-count); i++)
+	    		sb.append("0]0]0}");
+	    	
 	    	
 	    	return sb.toString();
 	    }
@@ -402,7 +559,7 @@ public class Crawler {
 	         return info;
 	    }
 	    
-	  //정보 탭에서 편의시설 및 서비스 크롤링
+	    //정보 탭에서 편의시설 및 서비스 크롤링
 	    private String restaurantServiceCrawling(WebDriver driver) {
 	        
 	        StringBuilder sb = new StringBuilder();
