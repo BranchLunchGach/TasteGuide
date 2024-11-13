@@ -28,13 +28,10 @@ jobs:
           maven-version: '3.9.9'
           cache: 'maven'
 
-      # 3. Java와 Maven 설치 확인
-      - name: Verify Java and Maven installation
+      # 3. application.properties 설정 (GitHub secret로부터)
+      - name: Configure application.properties
         run: |
-          echo "Java version:"
-          java -version
-          echo "Maven version:"
-          mvn -v
+          echo "${{ secrets.APPLICATION_PROPERTIES }}" > src/main/resources/application.properties
 
       # 4. Maven 빌드 실행
       - name: Build with Maven
@@ -66,10 +63,8 @@ jobs:
       # 7. 기존 파일 삭제, .war 파일은 제외
       - name: Delete old files, keep WAR file
         run: |
-          ls -al
           cp -r target/spring-0.0.1-SNAPSHOT.war .
           rm -rf target
-          ls -al
 
       # 8. Git LFS로 WAR 파일 추가 및 푸시
       - name: Force commit and push WAR file with Git LFS
