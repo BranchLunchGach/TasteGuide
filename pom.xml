@@ -176,6 +176,7 @@
             <classifier>models</classifier>
         </dependency>
         <!-- 크롤링 관련... -->
+        <!-- OAuth2 -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-oauth2-client</artifactId>
