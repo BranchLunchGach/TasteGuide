@@ -33,7 +33,7 @@ public class UserService {
 	
 	// 회원가입, 중복체크, 
 		@Transactional
-		public void signUp(User user) {
+		public User signUp(User user) {
 			if(userRepository.existsByUserId(user.getUserId()))
 				throw new MemberAuthenticationException("중복된 아이디!!", "Duplicated ID!!");
 			
@@ -47,6 +47,7 @@ public class UserService {
 			
 			User savedUser = userRepository.save(user);
 			log.info("savedUser ==> { }",savedUser);
+			return savedUser;
 		}
 		
 		@Transactional
@@ -96,7 +97,10 @@ public class UserService {
 			}
 			return 0;
 		}
+
+		
 	
+		
 	
 	
 }

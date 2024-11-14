@@ -1,19 +1,27 @@
-# Compiled class file
+# Compiled class files
 *.class
 *.classpath
-# Log file
+
+# Log files
 *.log
-#application.properties
+
+# application.properties (exclude from version control)
 application.properties
+#env file
+.env
 
-
-HELP.md
+# Build directories
 target/
-!.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
+# To ensure that target in subdirectories is also excluded
+**/target/
 
-### STS ###
+# Maven wrapper
+!.mvn/wrapper/maven-wrapper.jar
+# Exclude target directories in the src tree
+**/src/main/**/target/
+**/src/test/**/target/
+
+### STS (Spring Tool Suite) ###
 .apt_generated
 .classpath
 .factorypath
@@ -41,5 +49,9 @@ build/
 ### VS Code ###
 .vscode/
 
+
 ### API KEY ###
 api-keys.properties
+
+### macOS (system file) ###
+.DS_Store
