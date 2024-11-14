@@ -27,6 +27,15 @@ public class Crawler {
 	    ChromeOptions options = null;
 	    StringBuilder sb = null;
 	    
+	    public Crawler(int count, int zero) {
+	    	this.count = count;
+	        
+	    	driver = new ChromeDriver();
+	    	wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+	    	sb = new StringBuilder();
+	    	WebDriverManager.chromedriver().setup();  
+	    }
+	    
 	    public Crawler(int count) {
 	    	this.count = count;
 	    	
