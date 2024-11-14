@@ -59,7 +59,9 @@ public class UserController {
 		String userId = userService.findUserId(user);
 		log.info("userId="+userId);
 		if(userId == null) {
-			throw new BoardSearchNotException("해당하는 id가 존재하지 않습니다.", "findId Error");
+			return ResponseEntity
+					.status(200)
+					.body(null);
 		}else {
 			return ResponseEntity
 					.status(200)
