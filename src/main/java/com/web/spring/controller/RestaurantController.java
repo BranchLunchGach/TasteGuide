@@ -6,6 +6,7 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -42,6 +43,7 @@ public class RestaurantController {
 	}
 	
 	@PostMapping("/hello-restaurant")
+//	@CrossOrigin(origins = "http://localhost:3000")
 	public ResponseEntity<?> helloRecommend(@RequestBody RestaurantReq restaurantReq) {
 		
 		long start = System.currentTimeMillis();

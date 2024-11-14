@@ -207,7 +207,7 @@ public class RestaurantService {
 			
 			Queue<Restaurant> pq = new PriorityQueue<>();
 
-			Crawler crawler = new Crawler(10);
+			Crawler crawler = new Crawler(6, 0);
 			List<String> lists = crawler.hello(menu, avgX, avgY); //String 하나가 가게 하나의 모든 정보..
 						
 			// 크롤링한 데이터로 Restaurant 객체 생성
