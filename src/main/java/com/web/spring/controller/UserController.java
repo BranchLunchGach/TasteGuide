@@ -43,7 +43,9 @@ public class UserController {
 	}
 	@PostMapping("/mail")
 	@ResponseBody
-	public String SendEmail(@RequestParam String email) throws Exception {
+	public String SendEmail(@RequestBody String email) throws Exception {
+		System.out.println("sendmail start");
+		System.out.println("email ="+email);
 		int number = userService.createSendEmail(email) ;
 		String num = number+"";
 		

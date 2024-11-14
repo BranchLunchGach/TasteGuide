@@ -46,13 +46,14 @@ public class UserService {
 		@Transactional(readOnly = true)
 		public User findByUserId(String userId) {
 			User rUser=userRepository.findByUserId(userId);
-			log.info("rUser ==> { }",rUser);
+			log.info("rUser ==>"+rUser);
 			return rUser;
 			//if(rUser==null || rUser.equals("")) return "사용가능합니다.";
 			//else return "중복입니다.";
 		}
 		@Transactional
 		public int createSendEmail(String email) throws MessagingException {
+			System.out.println("createSendEmail start");
 			int number = (int)(Math.random() * (90000)) + 100000;
 			log.info(number+"");
 			String senderEmail = "gxc9706@gmail.com";
