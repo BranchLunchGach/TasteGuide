@@ -6,8 +6,9 @@
 *.log
 
 # application.properties (exclude from version control)
-application.properties
-#env file
+src/main/resources/application.properties
+
+#env fileß
 .env
 
 # Build directories
