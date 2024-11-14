@@ -6,7 +6,7 @@
 *.log
 
 # application.properties (exclude from version control)
-src/main/resources/application.properties
+application.properties
 
 #env fileß
 .env
