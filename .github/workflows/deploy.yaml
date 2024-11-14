@@ -32,6 +32,8 @@ jobs:
       - name: Configure application.properties
         run: |
           echo "${{ secrets.APPLICATION_PROPERTIES }}" > src/main/resources/application.properties
+          echo "${{ secrets.APIKEYS_PROPERTIES }}" > src/main/resources/api-keys.properties
+          echo "${{ secrets.ENV }}" > .env
           
       - name: Verify application.properties
         run: cat src/main/resources/application.properties
