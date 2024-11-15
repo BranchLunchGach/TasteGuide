@@ -111,6 +111,12 @@ public class UserService {
 				if(user.getPhone() != null&& ! user.getPhone().equals("")) {
 					rUser.setPhone(user.getPhone());
 				}
+				if(user.getBirthDate() != null&& ! user.getBirthDate().equals("")) {
+					rUser.setBirthDate(user.getBirthDate());
+				}
+				if(user.getGender() != null&& ! user.getGender().equals("")) {
+					rUser.setGender(user.getGender());
+				}
 			}else {
 				throw new BoardSearchNotException("db에 해당하는 유저가 존재하지 않습니다.", "updateUser 실행 중 에러 발생");
 			}
