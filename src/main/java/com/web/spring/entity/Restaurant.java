@@ -24,8 +24,10 @@ public class Restaurant implements Comparable<Restaurant> {
 	private String visitorReviewCnt; //방문자 리뷰 개수
 	private String blogReviewCnt; //블로그 리뷰 개수
 	private List<String> keywordReviews; //키워드 리뷰 10개
+	private List<String> textReviews; //텍스트 리뷰 5개
 	private String restauranInfo; //매장 소개
 	private String restauranService; //매장 편의시설 및 서비스
+	private String mainImg; //매장 대표 이미지
 	
 	private int restauranDistance; //현재 위치와 해당 레스토랑의 거리
 	private int score; //가중치

@@ -23,7 +23,6 @@ import lombok.RequiredArgsConstructor;
 public class RestaurantController {
 	
 	private final RestaurantService restaurantService;
-	private final MapAPI mapAPI;
 	
 	@PostMapping("/restaurant")
 	public ResponseEntity<?> restaurantRecommend(@RequestBody RestaurantReq restaurantReq) {
@@ -43,7 +42,6 @@ public class RestaurantController {
 	}
 	
 	@PostMapping("/hello-restaurant")
-//	@CrossOrigin(origins = "http://localhost:3000")
 	public ResponseEntity<?> helloRecommend(@RequestBody RestaurantReq restaurantReq) {
 		
 		long start = System.currentTimeMillis();
