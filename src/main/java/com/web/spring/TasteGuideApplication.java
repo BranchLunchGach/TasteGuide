@@ -22,8 +22,7 @@ public class TasteGuideApplication {
 		SpringApplication.run(TasteGuideApplication.class, args);
 		
 //		long startTime = System.currentTimeMillis();
-//		Crawler crawler = new Crawler();
-//		crawler.setCount(10);
+//		Crawler crawler = new Crawler(10, 0);
 //		
 //		String avgX = "126.72859388";
 //		String avgY = "37.51667508";
