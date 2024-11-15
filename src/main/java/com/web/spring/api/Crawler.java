@@ -119,6 +119,8 @@ public class Crawler {
 	                WebElement shopType = driver.findElement(By.cssSelector("span.KCMnt"));
 	                System.out.println(shop.getText()); //매장 이름
 	                
+	                String mainImg = driver.findElement(By.cssSelector("div.yLaWz>a>img")).getDomAttribute("src");
+	                
 	                //sb.append("[매장 이름] : " + shop.getText()).append("\n");
 	                //sb.append("[매장 타입] : " + shopType.getText()).append("\n");
 	                sb.append(shop.getText()).append("}");
@@ -179,10 +181,20 @@ public class Crawler {
 	                String reviewTotal = "";
 	                
 	                if(reviewTotalCnt.size() == 3) {
-	                	for (WebElement reviewCnt : reviewTotalCnt) {
-	                    	String review = reviewCnt.getText().replaceAll("[^0-9]", "");
-	                    	sb.append(review).append("}");
-	                    }
+//	                	for (WebElement reviewCnt : reviewTotalCnt) {
+//	                    	String review = reviewCnt.getText().replaceAll("[^0-9]", "");
+//	                    	sb.append(review).append("}");
+//	                    }
+	                	for (int j = 0; j<reviewTotalCnt.size(); j++) {
+	                		if(j == 0) {
+	                			String starReview = reviewTotalCnt.get(j).getText().replaceAll("[^0-9]", "");
+	                			double review = Integer.parseInt(starReview) * 0.01;
+		                    	sb.append(String.valueOf(review)).append("}");
+	                		} else {
+	                			String review = reviewTotalCnt.get(j).getText().replaceAll("[^0-9]", "");
+		                    	sb.append(review).append("}");
+	                		}
+	                	}
 	                } else {
 	                	sb.append("0").append("}");
 	                	for (WebElement reviewCnt : reviewTotalCnt) {
@@ -194,6 +206,10 @@ public class Crawler {
 	                List<String> keywordReviews = reviewRecommendKeyword(driver);
 	                for(String keywordReview : keywordReviews) 
 	                	sb.append(keywordReview).append("}");
+	                
+	                List<String> textReviews = reviewCrawling(driver);
+	                for(String textReview : textReviews) 
+	                	sb.append(textReview).append("}");
 	                                
 	                // ======================== 정보 탭 클릭 부분 ========================
 	                WebElement infoTab = getTab(driver, "정보");  
@@ -214,6 +230,7 @@ public class Crawler {
 	                                
 	                frameChange(driver, wait, "searchIframe");
 	                
+	                sb.append(mainImg).append("}");
 	                infos.add(sb.toString());
 	                sb.setLength(0);
 	            }
@@ -231,7 +248,7 @@ public class Crawler {
 	        try {     	           	            
 	            // 가게 이름 요소를 두 가지 경우에 맞게 찾기
 	            List<WebElement> shopLinks = wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.cssSelector("div>.place_bluelink>.TYaxT, div.place_bluelink.C6RjW > span.YwYLL")));
-	                        
+	            
 	            //가게들의 리뷰들을 담을 컬렉션
 	            List<String> infos = new ArrayList<>();
 
@@ -251,6 +268,8 @@ public class Crawler {
 	                
 	                frameChangeByEntryIframe(driver, wait);
 	                
+	                String mainImg = driver.findElement(By.cssSelector("div.fNygA>a>img")).getDomAttribute("src");
+	                
 	                List<WebElement> times = driver.findElements(By.cssSelector(".A_cdD>em"));
 	                if(!times.isEmpty()) {
 	                	String time = times.get(0).getText();
@@ -302,10 +321,16 @@ public class Crawler {
 	                String reviewTotal = "";
 	                
 	                if(reviewTotalCnt.size() == 3) {
-	                	for (WebElement reviewCnt : reviewTotalCnt) {
-	                    	String review = reviewCnt.getText().replaceAll("[^0-9]", "");
-	                    	sb.append(review).append("}");
-	                    }
+	                	for (int j = 0; j<reviewTotalCnt.size(); j++) {
+	                		if(j == 0) {
+	                			String starReview = reviewTotalCnt.get(j).getText().replaceAll("[^0-9]", "");
+	                			double review = Integer.parseInt(starReview) * 0.01;
+		                    	sb.append(String.format("%.2f", review)).append("}");
+	                		} else {
+	                			String review = reviewTotalCnt.get(j).getText().replaceAll("[^0-9]", "");
+		                    	sb.append(review).append("}");
+	                		}
+	                	}
 	                } else {
 	                	sb.append("0").append("}");
 	                	for (WebElement reviewCnt : reviewTotalCnt) {
@@ -317,6 +342,10 @@ public class Crawler {
 	                List<String> keywordReviews = reviewRecommendKeyword(driver);
 	                for(String keywordReview : keywordReviews) 
 	                	sb.append(keywordReview).append("}");
+	                
+	                List<String> textReviews = reviewCrawling(driver);
+	                for(String textReview : textReviews) 
+	                	sb.append(textReview).append("}");
 	                                
 	                // ======================== 정보 탭 클릭 부분 ========================
 	                WebElement infoTab = getTab(driver, "정보");  
@@ -337,6 +366,7 @@ public class Crawler {
 	                                
 	                frameChange(driver, wait, "searchIframe");
 	                
+	                sb.append(mainImg).append("}"); //메인 이미지 저장
 	                infos.add(sb.toString());
 	                sb.setLength(0);
 	            }
@@ -548,9 +578,10 @@ public class Crawler {
 	        
 	        int reviewCnt = 0;
 	        for (WebElement r : reviewsElement) {
-	        	reviewCnt++;
-	        	String review = r.findElement(By.cssSelector(".pui__vn15t2>a")).getText();
-	        	reviews.add(review);
+	        	if (reviewCnt >= 5) break;  // 리뷰가 5개에 도달하면 루프 종료	            
+	            reviewCnt++;
+	            String review = r.findElement(By.cssSelector(".pui__vn15t2>a")).getText();
+	            reviews.add(review);
 	        }
 	        System.out.println("<<<<<<<<< 총 " + reviewCnt +"개의 리뷰가 존재합니다!! >>>>>>>>>");
 	        return reviews;
