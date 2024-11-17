@@ -60,7 +60,7 @@ public class SecurityConfig {
                             @Override
                             public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
                                 CorsConfiguration configuration = new CorsConfiguration();
-                                configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://tasteguide.duckdns.org"));
+                                configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "https://tasteguide.site"));
                                 configuration.setAllowedMethods(Collections.singletonList("*"));
                                 configuration.setAllowCredentials(true);
 
