@@ -1,72 +1,82 @@
-name: Build, Deploy, and Update EC2
+name: Build and Deploy
 
 on:
   push:
     branches:
-      - main  # 'believeme' 브랜치에 푸시할 때 트리거
+      - believeme # believeme에 푸쉬될때 트리거
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     permissions:
-      contents: write  # 'contents' 권한을 'write'로 설정하여 푸시 권한 부여
+      contents: write
 
     steps:
-      # 1. 리포지토리 체크아웃
+      # 1. 리포지토리 체크아웃 (Git LFS 활성화)
       - name: Checkout Repository
         uses: actions/checkout@v2
-
-      # 2. Node.js 설치
-      - name: Set up Node.js
-        uses: actions/setup-node@v2
         with:
-          node-version: '18'  # 필요한 Node.js 버전으로 수정
+          fetch-depth: 0
+          lfs: true  # Git LFS 활성화
 
-      # 3. 환경 변수 적용 (Secrets에서 가져오기)
-      - name: Set up environment variables
+      # 2. Java와 Maven 설치
+      - name: Set up Java and Maven
+        uses: actions/setup-java@v2
+        with:
+          java-version: '17'
+          distribution: 'zulu'
+          maven-version: '3.9.9'
+          cache: 'maven'
+
+      # 3. application.properties 설정 (GitHub secret로부터)
+      - name: Create resources directory and configure application.properties
         run: |
+          mkdir -p src/main/resources  # src/main/resources 디렉토리 생성
+          echo "${{ secrets.APPLICATION_PROPERTIES }}" > src/main/resources/application.properties
+          echo "${{ secrets.APIKEYS_PROPERTIES }}" > src/main/resources/api-keys.properties
           echo "${{ secrets.ENV }}" > .env
-        env:
-          ENV: ${{ secrets.ENV }}  # GitHub Secrets에 저장된 ENV 변수 사용
-
-      # 4. 의존성 설치 및 빌드
-      - name: Install dependencies and build
-        run: |
-          npm install
-          npm run build
-        env:
-          CI: false  # CI 환경 변수를 false로 설정하여 ESLint 경고를 무시
-
-      # 5. AWS CLI 설치
-      - name: Install AWS CLI
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y awscli
-
-      # 6. AWS 설정
-      - name: Configure AWS
-        run: |
-          aws configure set aws_access_key_id "${{ secrets.AWS_ACCESS_KEY_ID }}"
-          aws configure set aws_secret_access_key "${{ secrets.AWS_SECRET_ACCESS_KEY }}"
-          aws configure set default.region "${{ secrets.AWS_REGION }}"  # AWS_REGION 환경 변수를 사용하여 리전 설정
-
-      # 7. 빌드 파일을 S3로 업로드 (덮어쓰기, TASTEGUDIE-FRONT 폴더에 업로드)
-      - name: Upload to S3
-        run: |
-          aws s3 cp build/ s3://tasteguide/TASTEGUDIE-FRONT/ --recursive  # build 폴더를 TASTEGUDIE-FRONT 폴더에 업로드
-
-      # 8. EC2에 SSH로 접속하여 S3에서 파일 다운로드 후 Springboot 재시작
-      - name: Deploy to EC2 and Restart Springboot
-        run: |
-          echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > private-key.pem
-          chmod 600 private-key.pem
           
-          # S3에서 파일 다운로드
-          ssh -o StrictHostKeyChecking=no -i private-key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_IP }} \
-            "aws s3 cp s3://tasteguide/tasteguide.war /home/ubuntu/ && \
-            sudo systemctl restart springboot"
+      - name: Verify application.properties
+        run: cat src/main/resources/application.properties
+        
+      # 4. Maven 빌드 실행
+      - name: Build with Maven
+        run: |
+          echo "Running mvn clean install to build project..."
+          mvn clean install -DskipTests
+          echo "Build completed."
+
+      # 5. .war 파일 생성 확인
+      - name: Verify WAR file location
+        run: |
+          echo "Checking for .war file in target directory..."
+          ls -l target/
+          if [ -f "target/spring-0.0.1-SNAPSHOT.war" ]; then
+            echo "WAR file found at target/spring-0.0.1-SNAPSHOT.war"
+          else
+            echo "WAR file not found!"
+            exit 1
+          fi
+
+      # 6. deploy 브랜치 체크아웃
+      - name: Checkout deploy branch
+        run: |
+          git config --global user.name "pleasebelieveme"
+          git config --global user.email "cain1227@naver.com"
+          git checkout deploy || git checkout --orphan deploy
+          git rm -rf .
+
+      # 7. 기존 파일 삭제, .war 파일은 제외
+      - name: Delete old files, keep WAR file
+        run: |
+          cp -r target/spring-0.0.1-SNAPSHOT.war .
+          rm -rf target
+
+      # 8. AWS S3에 WAR 파일 업로드
+      - name: Upload WAR file to S3
+        run: |
+          aws s3 cp spring-0.0.1-SNAPSHOT.war s3://tasteguide/tasteguide.war
         env:
-          EC2_SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
-          EC2_USER: ${{ secrets.EC2_USER }}
-          EC2_HOST: ${{ secrets.EC2_IP }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
