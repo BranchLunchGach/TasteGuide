@@ -46,6 +46,7 @@ public class RestaurantService {
 			List<String> menus = new ArrayList<>();
 			List<String> keywordReviews = new ArrayList<>();
 			List<Integer> keywordReviewCnts = new ArrayList<>();
+			List<String> textReviews = new ArrayList<>();
 			int keywordReviewCnt = 0; //키워드 전체 리뷰 개수
 			
 			//메뉴 5가지 저장
@@ -63,6 +64,10 @@ public class RestaurantService {
 				for (int i = 13; i<=22; i++) {
 					keywordReviews.add("0");
 				}
+			}
+			
+			for (int i = 23; i <= 27; i++) {
+				textReviews.add(datas[i]);
 			}
 			
 			// test 로그
@@ -97,7 +102,7 @@ public class RestaurantService {
 				List<String> coreKeyword = Arrays.asList(coreKeywords.replaceAll(" ", "").split(","));
 				
 				for(String k : coreKeyword)
-					if(datas[24].replaceAll(" ", "").contains(k)) score += 500;
+					if(datas[29].replaceAll(" ", "").contains(k)) score += 500;
 			}
 			
 			//
@@ -188,7 +193,7 @@ public class RestaurantService {
 			
 			//가중치 로직 끝...
 
-			Restaurant restaurant = new Restaurant(datas[0], datas[1], dayOff, datas[3], datas[4], menus, datas[10], datas[11], datas[12], keywordReviews, datas[23], datas[24], distance, score);
+			Restaurant restaurant = new Restaurant(datas[0], datas[1], dayOff, datas[3], datas[4], menus, datas[10], datas[11], datas[12], keywordReviews, textReviews, datas[28], datas[29], datas[30], distance, score);
 			
 			pq.add(restaurant);
 		}
@@ -207,7 +212,7 @@ public class RestaurantService {
 			
 			Queue<Restaurant> pq = new PriorityQueue<>();
 
-			Crawler crawler = new Crawler(10);
+			Crawler crawler = new Crawler(6, 0);
 			List<String> lists = crawler.hello(menu, avgX, avgY); //String 하나가 가게 하나의 모든 정보..
 						
 			// 크롤링한 데이터로 Restaurant 객체 생성
@@ -223,6 +228,7 @@ public class RestaurantService {
 				List<String> menus = new ArrayList<>();
 				List<String> keywordReviews = new ArrayList<>();
 				List<Integer> keywordReviewCnts = new ArrayList<>();
+				List<String> textReviews = new ArrayList<>();
 				
 				//메뉴 5가지 저장
 				for (int i = 5; i <= 9; i++)
@@ -243,6 +249,10 @@ public class RestaurantService {
 				}
 				System.out.println("키워드 리뷰 저장 지났씁니다~");
 				
+				for (int i = 23; i <= 27; i++) {
+					textReviews.add(datas[i]);
+				}
+				
 				//가중치 로직 시작...
 				if(datas[2].equals("오늘 휴무")) {
 					dayOff = true;
@@ -252,8 +262,17 @@ public class RestaurantService {
 				System.out.println("리뷰 개수 구하기 전!");
 				int totalReviewCnt = Integer.parseInt(datas[11]) + Integer.parseInt(datas[12]);
 				score += totalReviewCnt;
+				
+				//거리 구하기
+				System.out.println(datas[3]);
+				String address = mapAPI.getGeocode(datas[3]);
+				System.out.println(address);
+				String endX = address.split(",")[0];
+				String endY = address.split(",")[1];
+				String strDistance = mapAPI.getLinearDistance(avgX, avgY, endX, endY);
+				int distance = Integer.parseInt(strDistance);
 
-				Restaurant restaurant = new Restaurant(datas[0], datas[1], dayOff, datas[3], datas[4], menus, datas[10], datas[11], datas[12], keywordReviews, datas[23], datas[24], 0, score);
+				Restaurant restaurant = new Restaurant(datas[0], datas[1], dayOff, datas[3], datas[4], menus, datas[10], datas[11], datas[12], keywordReviews, textReviews, datas[28], datas[29], datas[30], distance, score);
 				
 				pq.add(restaurant);
 			}

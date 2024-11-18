@@ -41,7 +41,7 @@ public class MapAPI {
         try {
         	String addr = URLEncoder.encode(address, "UTF-8");
             String apiURL = "https://naveropenapi.apigw.ntruss.com/map-geocode/v2/geocode?query=" + addr;
-
+            
             URL url = new URL(apiURL);
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("GET");
@@ -62,6 +62,7 @@ public class MapAPI {
             while ((inputLine = br.readLine()) != null) {
                 response.append(inputLine);
             }
+            
             br.close();
 
             // JSON 응답을 처리
@@ -69,6 +70,8 @@ public class MapAPI {
             JSONObject object = new JSONObject(tokener);
             JSONArray arr = object.getJSONArray("addresses");
 
+            
+            System.out.println("44444444");
             if (arr.length() > 0) {
                 JSONObject temp = (JSONObject) arr.get(0);
                 return temp.get("x") + "," +  temp.get("y");

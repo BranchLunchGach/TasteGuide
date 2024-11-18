@@ -3,7 +3,7 @@ name: Build and Deploy
 on:
   push:
     branches:
-      - dev
+      - believeme # believeme에 푸쉬될때 트리거
 
 jobs:
   build:
@@ -58,8 +58,8 @@ jobs:
       # 6. deploy 브랜치 체크아웃
       - name: Checkout deploy branch
         run: |
-          git config --global user.name "pleasebelieveme"
-          git config --global user.email "cain1227@naver.com"
+          git config --global user.name "fly9702"
+          git config --global user.email "fiy9702@naver.com"
           git checkout deploy || git checkout --orphan deploy
           git rm -rf .
 

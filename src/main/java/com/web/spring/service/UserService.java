@@ -23,13 +23,6 @@ public class UserService {
 	private final PasswordEncoder passwordEncoder;
 	private final JavaMailSender javaMailSender;
 	
-	@Transactional(readOnly = true)
-	public String duplicateCheck(String userId) {
-		User rUser=userRepository.duplicateCheck(userId);
-		log.info("rUser ==> { }",rUser);
-		if(rUser==null || rUser.equals("")) return "사용가능합니다.";
-		else return "중복입니다.";
-	}
 	
 	// 회원가입, 중복체크, 
 		@Transactional
@@ -39,19 +32,28 @@ public class UserService {
 			
 			//비번 암호화
 			String encPwd=passwordEncoder.encode(user.getPassword());
-			log.info("encPwd ==> { }",encPwd);
+			log.info("encPwd ==> "+encPwd);
 			user.setPassword(encPwd);
 			
 			//Role 설정
 			user.setRole("ROLE_USER");//지금은 앞부분에 ROLE_를 지정해주지 않는다!!
 			
 			User savedUser = userRepository.save(user);
-			log.info("savedUser ==> { }",savedUser);
+			log.info("savedUser ==>"+savedUser);
 			return savedUser;
 		}
 		
+		@Transactional(readOnly = true)
+		public User findByUserId(String userId) {
+			User rUser=userRepository.findByUserId(userId);
+			log.info("rUser ==>"+rUser);
+			return rUser;
+			//if(rUser==null || rUser.equals("")) return "사용가능합니다.";
+			//else return "중복입니다.";
+		}
 		@Transactional
 		public int createSendEmail(String email) throws MessagingException {
+			System.out.println("createSendEmail start");
 			int number = (int)(Math.random() * (90000)) + 100000;
 			log.info(number+"");
 			String senderEmail = "gxc9706@gmail.com";
@@ -84,7 +86,7 @@ public class UserService {
 			}
 			
 		}
-		
+		/*
 		@Transactional
 		public int updatePassword(String password, String userId) {
 			User rUser = userRepository.findByUserId(userId);
@@ -97,8 +99,35 @@ public class UserService {
 			}
 			return 0;
 		}
-
+		*/
+		@Transactional
+		public User updateUser(User user) {
+			
+			User rUser = userRepository.findByUserId(user.getUserId());
+			if(rUser != null) {
+				if(user.getPassword() != null && ! user.getPassword().equals("")) {
+					rUser.setPassword(passwordEncoder.encode(user.getPassword()));					
+				}
+				if(user.getPhone() != null&& ! user.getPhone().equals("")) {
+					rUser.setPhone(user.getPhone());
+				}
+				if(user.getBirthDate() != null&& ! user.getBirthDate().equals("")) {
+					rUser.setBirthDate(user.getBirthDate());
+				}
+				if(user.getGender() != null&& ! user.getGender().equals("")) {
+					rUser.setGender(user.getGender());
+				}
+			}else {
+				throw new BoardSearchNotException("db에 해당하는 유저가 존재하지 않습니다.", "updateUser 실행 중 에러 발생");
+			}
+			return rUser;
+		}
 		
+		@Transactional
+		public int deleteUser(String userId) {
+			userRepository.deleteByUserId(userId);
+			return 1;
+		}
 	
 		
 	
