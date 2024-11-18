@@ -29,7 +29,7 @@ public class RestaurantService {
 		
 		// Headless
 		long startTime = System.currentTimeMillis();
-		Crawler crawler = new Crawler(10);
+		Crawler crawler = new Crawler(5);
 		List<String> lists = crawler.reviewCrawling(menu); //String 하나가 가게 하나의 모든 정보..
 		
 		System.out.println("크롤링 데이터 사이즈 : " + lists.size());
@@ -212,7 +212,7 @@ public class RestaurantService {
 			
 			Queue<Restaurant> pq = new PriorityQueue<>();
 
-			Crawler crawler = new Crawler(6, 0);
+			Crawler crawler = new Crawler(10, 0);
 			List<String> lists = crawler.hello(menu, avgX, avgY); //String 하나가 가게 하나의 모든 정보..
 						
 			// 크롤링한 데이터로 Restaurant 객체 생성
@@ -281,7 +281,6 @@ public class RestaurantService {
 			
 			return pq;
 		} // ======================= 만남의장소 식당 3개 추천 기능 =======================
-	
 	
 	private int reviewScore(String keyword, List<String> keywordReviews, List<Integer> keywordReviewCnts, int keywordReviewCnt) {
 		int index = keywordReviews.indexOf(keyword);

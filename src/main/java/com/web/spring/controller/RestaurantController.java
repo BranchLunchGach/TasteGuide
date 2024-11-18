@@ -6,16 +6,16 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.web.spring.api.MapAPI;
 import com.web.spring.dto.RestaurantReq;
 import com.web.spring.entity.Restaurant;
 import com.web.spring.service.RestaurantService;
 
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -51,6 +51,9 @@ public class RestaurantController {
 		System.out.println("[RestaurantController] 실행중...");
 		pq = restaurantService.helloRecommend(restaurantReq.getMenu(), restaurantReq.getAvgX(), restaurantReq.getAvgY());
 		System.out.println("[RestaurantController] 실행끝...");
+		list.add(pq.poll());
+		list.add(pq.poll());
+		list.add(pq.poll());
 		list.add(pq.poll());
 		list.add(pq.poll());
 		list.add(pq.poll());

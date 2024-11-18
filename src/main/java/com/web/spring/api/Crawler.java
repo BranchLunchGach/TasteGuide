@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
@@ -268,7 +269,7 @@ public class Crawler {
 	                
 	                frameChangeByEntryIframe(driver, wait);
 	                
-	                String mainImg = driver.findElement(By.cssSelector("div.fNygA>a>img")).getDomAttribute("src");
+	                String mainImg = driver.findElement(By.cssSelector("div.fNygA>a>img, div.GWWbE>a>img")).getDomAttribute("src");
 	                
 	                List<WebElement> times = driver.findElements(By.cssSelector(".A_cdD>em"));
 	                if(!times.isEmpty()) {
@@ -292,16 +293,25 @@ public class Crawler {
 	                    // 요소가 없는 경우 "주소 미작성" 출력
 	                	//sb.append("[매장 위치] : 주소 미작성").append("\n");
 	                	sb.append("0").append("}");
-	                }
+	                } 
 	                
 	                // ======================== 메뉴 탭 클릭 부분 ========================
-	                WebElement menuTab = getTab(driver, "메뉴");         
-	                
 	                // 메뉴 탭 클릭 및 활성화 확인
 	                try {
+	                	WebElement menuTab = getTab(driver, "메뉴"); 
 	                	tabClickAndActiveCheck(driver, menuTab);
+	                } catch (NullPointerException e) {
+	                	System.out.println("탭이 존재하지 않아 불가피하게 종료...");
+	                	sb.setLength(0);
+	                	frameChange(driver, wait, "searchIframe");
+	                	continue;
 	                } catch (StaleElementReferenceException e) {
-	                	System.out.println("불가피하게 종료...");
+	                	System.out.println("해당 요소가 존재하지 않아? 불가피하게 종료...");
+	                	sb.setLength(0);
+	                	frameChange(driver, wait, "searchIframe");
+	                	continue;
+	                } catch (JavascriptException e) {
+	                	System.out.println("클릭할 수 없어 불가피하게 종료...");
 	                	sb.setLength(0);
 	                	frameChange(driver, wait, "searchIframe");
 	                	continue;
@@ -310,15 +320,27 @@ public class Crawler {
 	                String menus = menuCrawling(driver);
 	                sb.append(menus);                         
 	                
-	                // ======================== 리뷰 탭 클릭 부분 ========================
-	                WebElement reviewTab = getTab(driver, "리뷰");         
-	                
-	                // 리뷰 탭 클릭 및 활성화 확인
-	                tabClickAndActiveCheck(driver, reviewTab);     
+	                // ======================== 리뷰 탭 클릭 부분 ========================    
+	                try {
+	                	WebElement reviewTab = getTab(driver, "리뷰");
+	                	// 리뷰 탭 클릭 및 활성화 확인
+		                tabClickAndActiveCheck(driver, reviewTab);  
+	                } catch (NullPointerException e) {
+	                	System.out.println("탭이 존재하지 않아 불가피하게 종료...");
+	                	sb.setLength(0);
+	                	frameChange(driver, wait, "searchIframe");
+	                	continue;
+	                } catch (JavascriptException e) {
+	                	System.out.println("클릭할 수 없어 불가피하게 종료...");
+	                	sb.setLength(0);
+	                	frameChange(driver, wait, "searchIframe");
+	                	continue;
+	                }
+
 	                
 	                // 별점 및 총 리뷰(블로그 리뷰, 방문자 리뷰) 개수 가져오기.
 	                List<WebElement> reviewTotalCnt = driver.findElements(By.cssSelector("span.PXMot"));
-	                String reviewTotal = "";
+	                String reviewTotal = "";	              
 	                
 	                if(reviewTotalCnt.size() == 3) {
 	                	for (int j = 0; j<reviewTotalCnt.size(); j++) {
@@ -432,7 +454,7 @@ public class Crawler {
 	    
 	    
 	    // 탭 활성화 확인
-	    private void tabClickAndActiveCheck(WebDriver driver, WebElement clickTab) throws InterruptedException {    	
+	    private void tabClickAndActiveCheck(WebDriver driver, WebElement clickTab) throws InterruptedException, JavascriptException {    	
 	    	((JavascriptExecutor) driver).executeScript("arguments[0].click();", clickTab);
 	    	
 	        while (!clickTab.getAttribute("aria-selected").equals("true")) {
@@ -528,7 +550,7 @@ public class Crawler {
 	        }           
 	        
 	        if (isReviewSticker) {
-	        	Thread.sleep(1000);
+	        	Thread.sleep(2000);
 	            List<WebElement> reviewBenefits = driver.findElements(By.cssSelector(".MHaAm"));
 	            
 	            for (WebElement benefits : reviewBenefits) {
@@ -575,15 +597,29 @@ public class Crawler {
 	    	// 리뷰를 담는 List 생성
 	    	List<String> reviews = new ArrayList<>();
 	    	List<WebElement> reviewsElement = driver.findElements(By.cssSelector("li.EjjAW")); 
+	    	
+	    	try {
+	    		int reviewCnt = 0;
+		        for (WebElement r : reviewsElement) {
+		        	if (reviewCnt >= 5) break;  // 리뷰가 5개에 도달하면 루프 종료	            
+		            reviewCnt++;
+		            String review = r.findElement(By.cssSelector(".pui__vn15t2>a")).getText();
+		            reviews.add(review);
+		        }
+		        
+		        // 부족한 리뷰를 "0"으로 채우기
+		        while (reviews.size() < 5)
+		            reviews.add("0");
+		        
+	    	} catch (NoSuchElementException e) {
+	    		int cnt = 0;
+	    		while(cnt < 5) {
+	    			cnt++;
+	    			System.out.println("리뷰 요소가 존재하지 않습니다. 전부 0으로 채우겠습니다.");
+	    			reviews.add("0");
+	    		}
+	    	}
 	        
-	        int reviewCnt = 0;
-	        for (WebElement r : reviewsElement) {
-	        	if (reviewCnt >= 5) break;  // 리뷰가 5개에 도달하면 루프 종료	            
-	            reviewCnt++;
-	            String review = r.findElement(By.cssSelector(".pui__vn15t2>a")).getText();
-	            reviews.add(review);
-	        }
-	        System.out.println("<<<<<<<<< 총 " + reviewCnt +"개의 리뷰가 존재합니다!! >>>>>>>>>");
 	        return reviews;
 	    }
 	    
