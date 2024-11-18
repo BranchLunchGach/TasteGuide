@@ -25,7 +25,6 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/auth")
-
 public class GoogleAuthController {
 	
 	@Autowired

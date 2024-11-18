@@ -17,6 +17,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -26,14 +27,13 @@ import lombok.extern.slf4j.Slf4j;
 @NoArgsConstructor
 @Builder
 @Slf4j
-@PropertySource("classpath:api-keys.properties")
 @Component
 public class MapAPI {
-	@Value("${clientId}")
+	@Value("${naverClientId}")
 	private  String clientId; // 네이버 API 클라이언트 ID
-	@Value("${clientSecret}")
+	@Value("${naverClientSecret}")
 	private  String clientSecret; // 네이버 API 비밀 키
-	@Value("${appKey}")
+	@Value("${tMapAppKey}")
 	private  String appKey; //티맵 API 앱 키
 	
 	// 주소를 받아 위도와 경도를 반환
