@@ -158,6 +158,8 @@ public class MapAPI {
 
             JSONTokener tokener = new JSONTokener(responseString);  // 응답을 JSONTokener로 변환
             JSONObject object = new JSONObject(tokener);  // JSONObject로 파싱
+            
+            System.out.println(object);
 
             // 'distanceInfo'는 객체입니다.
             if (object.has("distanceInfo")) {

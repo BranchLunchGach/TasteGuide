@@ -60,6 +60,130 @@ public class Crawler {
 	    	WebDriverManager.chromedriver().setup();  
 	    }
 	    
+	    public List<String> aiRecommend(String keyword) {
+	    	 try {
+    		 	// JavaScript로 검색어를 입력
+	        	keywordSearch(driver, wait, keyword);    
+	            
+	            // 가게 이름 요소를 두 가지 경우에 맞게 찾기
+	            List<WebElement> shopLinks = wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.cssSelector("div>.place_bluelink>.TYaxT, div.place_bluelink.C6RjW > span.YwYLL")));
+	            	                        
+	            //가게들의 리뷰들을 담을 컬렉션
+	            List<String> infos = new ArrayList<>();
+	            
+	            for (int i = 0; i < Math.min(count, shopLinks.size()); i++) {
+	                WebElement shop = shopLinks.get(i);
+	                
+	                System.out.println(shop.getText()); //매장 이름	               
+	                
+	                //매장 이름
+	                sb.append(shop.getText()).append("}"); 
+	                
+	                detailPageActiveCheck(driver, shop);
+	                
+	                frameChangeByEntryIframe(driver, wait);
+	                
+	                //오늘 휴무인지 체크
+	                List<WebElement> times = driver.findElements(By.cssSelector(".A_cdD>em"));
+	                if(!times.isEmpty()) {
+	                	String time = times.get(0).getText();
+	                	if(time.equals("오늘 휴무")) sb.append("오늘 휴무").append("}");
+	                	else  sb.append("0").append("}");
+	                } else sb.append("0");
+	                
+	                int btnCnt = 0;
+	                WebElement button = null;
+	                boolean isClick = false;
+	                
+	                while (btnCnt < 3) {
+	                	try {
+		                	button = driver.findElement(By.cssSelector("span.U7pYf"));
+		                	((JavascriptExecutor) driver).executeScript("arguments[0].click();", button);
+			                System.out.println("[AI]영업시간 클릭 완료!!");
+			                isClick = true;
+			                break;
+		                } catch (NoSuchElementException e) {
+		                	System.out.println("[AI] 영업시간 클릭 실패.. 재시도 진행...");
+		                	Thread.sleep(1000);
+		                	btnCnt++;
+		                }
+	                }
+	                
+	                if (!isClick) {
+	                	System.out.println("[AI] 영업시간 클릭 실패로 다음 요소로 진행...");
+	                	frameChange(driver, wait, "searchIframe");
+		                sb.setLength(0);	
+		                continue;
+	                }
+	                
+	                
+	                Thread.sleep(2000);
+	                
+	                List<WebElement> openTime = driver.findElements(By.cssSelector("div.w9QyJ div.H3ua4"));
+	                System.out.println("[AI] openTime size() >> " + openTime.size());
+	                
+	                if(openTime.size() == 1)
+//	                	System.out.println("[AI] openTime size 1일때의 값... >> " + openTime.get(0).getText());
+	                	sb.append(openTime.get(0).getText()).append("}");
+	                else 
+//	                	System.out.println("[AI] openTime size의 값... >> " + openTime.get(1).getText());
+	                	sb.append(openTime.get(1).getText()).append("}");
+	                
+	                // ======================== 메뉴 탭 클릭 부분 ========================
+	                try {
+	                	WebElement menuTab = getTab(driver, "메뉴"); 
+	                	tabClickAndActiveCheck(driver, menuTab);
+	                } catch (NullPointerException e) {
+	                	System.out.println("탭이 존재하지 않아 불가피하게 종료...");
+	                	sb.setLength(0);
+	                	frameChange(driver, wait, "searchIframe");
+	                	continue;
+	                } catch (StaleElementReferenceException e) {
+	                	System.out.println("해당 요소가 존재하지 않아? 불가피하게 종료...");
+	                	sb.setLength(0);
+	                	frameChange(driver, wait, "searchIframe");
+	                	continue;
+	                } catch (JavascriptException e) {
+	                	System.out.println("클릭할 수 없어 불가피하게 종료...");
+	                	sb.setLength(0);
+	                	frameChange(driver, wait, "searchIframe");
+	                	continue;
+	                }
+	                
+	                //메뉴명 5개 가져오기
+	                List<String> menu = new ArrayList<>();
+	    	    	List<WebElement> allMenuElements = driver.findElements(By.cssSelector(".E2jtL, li.order_list_item"));
+	    	    	int count = 0;	    	    
+	    	    	
+	    	    	// 최대 5개만 가져오기
+	    	    	List<WebElement> menuElements = allMenuElements.size() > 5 ? allMenuElements.subList(0, 5) : allMenuElements;
+
+	    	    	System.out.println("가져온 메뉴 수: " + menuElements.size());
+	    	    	
+	    	    	for (WebElement w : menuElements) {
+
+	    	        	String name = w.findElement(By.cssSelector(".lPzHi, .info_detail>.tit")).getText();	            
+
+	    	        	sb.append(name).append("}");
+	    	        	count++;
+	    	        }
+	    	    	
+	    	    	for (int j = 0; j < (5-count); j++)
+	    	    		sb.append("0}");
+	                                
+	                frameChange(driver, wait, "searchIframe");
+	                
+	                infos.add(sb.toString());
+	                sb.setLength(0);	                
+	            }
+	            return infos;
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        } 
+	        
+	        return null;
+	    }
+	    
 	    public List<String> hello(String menu, String x, String y) {	        
 	        
 	    	try {
@@ -86,6 +210,7 @@ public class Crawler {
 		            System.out.println("iframe이 아직 로드되지 않았습니다...");
 		            Thread.sleep(500); // 짧은 시간 대기 후 반복 확인
 		        }
+		        
 		        driver.switchTo().frame("searchIframe");
 		        
 		        return reviewCrawlin2(menu);
@@ -107,9 +232,7 @@ public class Crawler {
 	            
 	            // 가게 이름 요소를 두 가지 경우에 맞게 찾기
 	            List<WebElement> shopLinks = wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.cssSelector("div>.place_bluelink>.TYaxT, div.place_bluelink.C6RjW > span.YwYLL")));
-	            
-	           //System.out.println("가게를 찾았다!");
-	                        
+	            	                        
 	            //가게들의 리뷰들을 담을 컬렉션
 	            List<String> infos = new ArrayList<>();
 
@@ -118,51 +241,62 @@ public class Crawler {
 	                WebElement shop = shopLinks.get(i);
 	                
 	                WebElement shopType = driver.findElement(By.cssSelector("span.KCMnt"));
-	                System.out.println(shop.getText()); //매장 이름
+	                System.out.println(shop.getText()); //매장 이름	               
 	                
-	                String mainImg = driver.findElement(By.cssSelector("div.yLaWz>a>img")).getDomAttribute("src");
-	                
-	                //sb.append("[매장 이름] : " + shop.getText()).append("\n");
-	                //sb.append("[매장 타입] : " + shopType.getText()).append("\n");
-	                sb.append(shop.getText()).append("}");
-	                sb.append(shopType.getText()).append("}");
+	                sb.append(shop.getText()).append("}"); //sb.append("[매장 이름] : " + shop.getText()).append("\n");
+	                sb.append(shopType.getText()).append("}"); //sb.append("[매장 타입] : " + shopType.getText()).append("\n");
 	                
 	                detailPageActiveCheck(driver, shop);
 	                
 	                frameChangeByEntryIframe(driver, wait);
+	                
+	                String mainImg = driver.findElement(By.cssSelector("div.fNygA>a>img, div.GWWbE>a>img")).getDomAttribute("src");
 	                
 	                List<WebElement> times = driver.findElements(By.cssSelector(".A_cdD>em"));
 	                if(!times.isEmpty()) {
 	                	String time = times.get(0).getText();
 	                	if(time.equals("오늘 휴무")) sb.append("오늘 휴무").append("}");
 	                	else  sb.append("0").append("}");
-	                	
-	                }
+	                } else sb.append("0");
 	                
 	                //주소 및 위치 가져와 보기.
-	                WebElement address = driver.findElement(By.cssSelector("span.LDgIH"));
-	                //sb.append("[매장 주소] : " + address.getText()).append("\n");
-	                sb.append(address.getText()).append("}");
-	                
+	                WebElement address = driver.findElement(By.cssSelector("span.LDgIH"));	               
+	                sb.append(address.getText()).append("}"); //sb.append("[매장 주소] : " + address.getText()).append("\n");
+
 	                try {
 	                    WebElement location = driver.findElement(By.cssSelector("div.nZapA"));
-	                    // 요소가 있는 경우 텍스트를 가져와 출력
-	                    //sb.append("[매장 위치] : " + location.getText().replace("미터", "")).append("\n");
-	                    sb.append(location.getText().replace("\n", " ").replace("미터", "")).append("}");
+	                    List<WebElement> locationNum = driver.findElements(By.cssSelector("span.DNzQ2"));
+	                    
+	                    if(locationNum.size() == 0) sb.append(location.getText().replace("\n", " ").replace("미터", "")).append("}"); 
+	                    else {
+	                    	String num = "";
+	                    	for(WebElement w : locationNum) {
+	                    		num += w.getText();
+	                    	}
+	                    	System.out.println(num);
+	                    	sb.append(location.getText().replace("\n", " ").replace("미터", "").replace(num, "")).append("}");
+	                    }
 	                } catch (NoSuchElementException e) {
-	                    // 요소가 없는 경우 "주소 미작성" 출력
-	                	//sb.append("[매장 위치] : 주소 미작성").append("\n");
-	                	sb.append("0").append("}");
-	                }
+	                	sb.append("0").append("}"); //sb.append("[매장 위치] : 주소 미작성").append("\n");
+	                }    
 	                
 	                // ======================== 메뉴 탭 클릭 부분 ========================
-	                WebElement menuTab = getTab(driver, "메뉴");         
-	                
-	                // 메뉴 탭 클릭 및 활성화 확인
+
 	                try {
+	                	WebElement menuTab = getTab(driver, "메뉴"); 
 	                	tabClickAndActiveCheck(driver, menuTab);
+	                } catch (NullPointerException e) {
+	                	System.out.println("탭이 존재하지 않아 불가피하게 종료...");
+	                	sb.setLength(0);
+	                	frameChange(driver, wait, "searchIframe");
+	                	continue;
 	                } catch (StaleElementReferenceException e) {
-	                	System.out.println("불가피하게 종료...");
+	                	System.out.println("해당 요소가 존재하지 않아? 불가피하게 종료...");
+	                	sb.setLength(0);
+	                	frameChange(driver, wait, "searchIframe");
+	                	continue;
+	                } catch (JavascriptException e) {
+	                	System.out.println("클릭할 수 없어 불가피하게 종료...");
 	                	sb.setLength(0);
 	                	frameChange(driver, wait, "searchIframe");
 	                	continue;
@@ -172,37 +306,51 @@ public class Crawler {
 	                sb.append(menus);                         
 	                
 	                // ======================== 리뷰 탭 클릭 부분 ========================
-	                WebElement reviewTab = getTab(driver, "리뷰");         
-	                
-	                // 리뷰 탭 클릭 및 활성화 확인
-	                tabClickAndActiveCheck(driver, reviewTab);     
+	                try {
+	                	WebElement reviewTab = getTab(driver, "리뷰");
+	                	// 리뷰 탭 클릭 및 활성화 확인
+		                tabClickAndActiveCheck(driver, reviewTab);  
+	                } catch (NullPointerException e) {
+	                	System.out.println("탭이 존재하지 않아 불가피하게 종료...");
+	                	sb.setLength(0);
+	                	frameChange(driver, wait, "searchIframe");
+	                	continue;
+	                } catch (JavascriptException e) {
+	                	System.out.println("클릭할 수 없어 불가피하게 종료...");
+	                	sb.setLength(0);
+	                	frameChange(driver, wait, "searchIframe");
+	                	continue;
+	                }
 	                
 	                // 별점 및 총 리뷰(블로그 리뷰, 방문자 리뷰) 개수 가져오기.
 	                List<WebElement> reviewTotalCnt = driver.findElements(By.cssSelector("span.PXMot"));
-	                String reviewTotal = "";
+	                String reviewTotal = "";	              
 	                
 	                if(reviewTotalCnt.size() == 3) {
-//	                	for (WebElement reviewCnt : reviewTotalCnt) {
-//	                    	String review = reviewCnt.getText().replaceAll("[^0-9]", "");
-//	                    	sb.append(review).append("}");
-//	                    }
-	                	for (int j = 0; j<reviewTotalCnt.size(); j++) {
+	                	for (int j = 0; j < reviewTotalCnt.size(); j++) {
 	                		if(j == 0) {
 	                			String starReview = reviewTotalCnt.get(j).getText().replaceAll("[^0-9]", "");
 	                			double review = Integer.parseInt(starReview) * 0.01;
-		                    	sb.append(String.valueOf(review)).append("}");
+		                    	sb.append(String.format("%.2f", review)).append("}");
 	                		} else {
 	                			String review = reviewTotalCnt.get(j).getText().replaceAll("[^0-9]", "");
 		                    	sb.append(review).append("}");
 	                		}
 	                	}
-	                } else {
+	                } else if (reviewTotalCnt.size() == 1) { //블로그 리뷰만 존재하는경우...
+	                	sb.append("0").append("}");
 	                	sb.append("0").append("}");
 	                	for (WebElement reviewCnt : reviewTotalCnt) {
 	                    	String review = reviewCnt.getText().replaceAll("[^0-9]", "");
 	                    	sb.append(review).append("}");
 	                    }
-	                }              
+	                }  else { //별점 리뷰가 존재하지 않을경우..
+	                	sb.append("0").append("}");
+	                	for (WebElement reviewCnt : reviewTotalCnt) {
+	                    	String review = reviewCnt.getText().replaceAll("[^0-9]", "");
+	                    	sb.append(review).append("}");
+	                    }
+	                }             
 
 	                List<String> keywordReviews = reviewRecommendKeyword(driver);
 	                for(String keywordReview : keywordReviews) 
@@ -220,10 +368,8 @@ public class Crawler {
 	                    
 	                    String info = infoCrawling(driver);
 	                    String service = restaurantServiceCrawling(driver);
-//	                    sb.append("[매장 소개] : " + info).append("\n");
-//	                    sb.append("[매장 서비스] : " + service).append("\n");
-	                    sb.append(info).append("}");
-	                    sb.append(service).append("}");
+	                    sb.append(info).append("}"); //sb.append("[매장 소개] : " + info).append("\n");
+	                    sb.append(service).append("}"); //sb.append("[매장 서비스] : " + service).append("\n");
 	                } else {
 	                	sb.append("0").append("}");
 	                	sb.append("0").append("}");
@@ -233,7 +379,7 @@ public class Crawler {
 	                
 	                sb.append(mainImg).append("}");
 	                infos.add(sb.toString());
-	                sb.setLength(0);
+	                sb.setLength(0);	                
 	            }
 	            return infos;
 	            
@@ -260,10 +406,8 @@ public class Crawler {
 	                WebElement shopType = driver.findElement(By.cssSelector("span.KCMnt"));
 	                System.out.println(shop.getText()); //매장 이름
 	                
-	                //sb.append("[매장 이름] : " + shop.getText()).append("\n");
-	                //sb.append("[매장 타입] : " + shopType.getText()).append("\n");
-	                sb.append(shop.getText()).append("}");
-	                sb.append(shopType.getText()).append("}");
+	                sb.append(shop.getText()).append("}"); //sb.append("[매장 이름] : " + shop.getText()).append("\n");
+	                sb.append(shopType.getText()).append("}"); //sb.append("[매장 타입] : " + shopType.getText()).append("\n");
 	                
 	                detailPageActiveCheck(driver, shop);
 	                
@@ -276,23 +420,24 @@ public class Crawler {
 	                	String time = times.get(0).getText();
 	                	if(time.equals("오늘 휴무")) sb.append("오늘 휴무").append("}");
 	                	else  sb.append("0").append("}");
-	                	
-	                }
+	                } else sb.append("0").append("}");
 	                
-	                //주소 및 위치 가져와 보기.
-	                WebElement address = driver.findElement(By.cssSelector("span.LDgIH"));
-	                //sb.append("[매장 주소] : " + address.getText()).append("\n");
-	                sb.append(address.getText()).append("}");
+	                //주소 및 위치 가져와 보기 , 요소가 있는 경우 텍스트를 가져와 출력 , 요소가 없는 경우 "주소 미작성" 출력
+	                WebElement address = driver.findElement(By.cssSelector("span.LDgIH"));	               
+	                sb.append(address.getText()).append("}"); //sb.append("[매장 주소] : " + address.getText()).append("\n");	                
 	                
 	                try {
 	                    WebElement location = driver.findElement(By.cssSelector("div.nZapA"));
+	                    List<WebElement> locationNum = driver.findElements(By.cssSelector("span.DNzQ2"));
 	                    // 요소가 있는 경우 텍스트를 가져와 출력
-	                    //sb.append("[매장 위치] : " + location.getText().replace("미터", "")).append("\n");
-	                    sb.append(location.getText().replace("\n", " ").replace("미터", "")).append("}");
+	                    if(locationNum.size() == 0) sb.append(location.getText().replace("\n", " ").replace("미터", "")).append("}"); 
+	                    else {
+	                    	String num = locationNum.get(0).getText();
+	                    	sb.append(location.getText().replace("\n", " ").replace("미터", "").replace(num, "")).append("}");
+	                    }
 	                } catch (NoSuchElementException e) {
 	                    // 요소가 없는 경우 "주소 미작성" 출력
-	                	//sb.append("[매장 위치] : 주소 미작성").append("\n");
-	                	sb.append("0").append("}");
+	                	sb.append("0").append("}"); //sb.append("[매장 위치] : 주소 미작성").append("\n");
 	                } 
 	                
 	                // ======================== 메뉴 탭 클릭 부분 ========================
@@ -343,7 +488,7 @@ public class Crawler {
 	                String reviewTotal = "";	              
 	                
 	                if(reviewTotalCnt.size() == 3) {
-	                	for (int j = 0; j<reviewTotalCnt.size(); j++) {
+	                	for (int j = 0; j < reviewTotalCnt.size(); j++) {
 	                		if(j == 0) {
 	                			String starReview = reviewTotalCnt.get(j).getText().replaceAll("[^0-9]", "");
 	                			double review = Integer.parseInt(starReview) * 0.01;
@@ -353,13 +498,21 @@ public class Crawler {
 		                    	sb.append(review).append("}");
 	                		}
 	                	}
-	                } else {
+	                } else if (reviewTotalCnt.size() == 1) { //블로그 리뷰만 존재하는경우...
+	                	sb.append("0").append("}");
+	                	sb.append("0").append("}");
+	                	for (WebElement reviewCnt : reviewTotalCnt) {
+	                    	String review = reviewCnt.getText().replaceAll("[^0-9]", "");
+	                    	sb.append(review).append("}");
+	                    }
+	                }  else { //별점 리뷰가 존재하지 않을경우..
 	                	sb.append("0").append("}");
 	                	for (WebElement reviewCnt : reviewTotalCnt) {
 	                    	String review = reviewCnt.getText().replaceAll("[^0-9]", "");
 	                    	sb.append(review).append("}");
 	                    }
 	                }              
+	                
 
 	                List<String> keywordReviews = reviewRecommendKeyword(driver);
 	                for(String keywordReview : keywordReviews) 
@@ -368,6 +521,7 @@ public class Crawler {
 	                List<String> textReviews = reviewCrawling(driver);
 	                for(String textReview : textReviews) 
 	                	sb.append(textReview).append("}");
+	                
 	                                
 	                // ======================== 정보 탭 클릭 부분 ========================
 	                WebElement infoTab = getTab(driver, "정보");  
@@ -377,10 +531,8 @@ public class Crawler {
 	                    
 	                    String info = infoCrawling(driver);
 	                    String service = restaurantServiceCrawling(driver);
-//	                    sb.append("[매장 소개] : " + info).append("\n");
-//	                    sb.append("[매장 서비스] : " + service).append("\n");
-	                    sb.append(info).append("}");
-	                    sb.append(service).append("}");
+	                    sb.append(info).append("}"); //sb.append("[매장 소개] : " + info).append("\n");
+	                    sb.append(service).append("}"); //sb.append("[매장 서비스] : " + service).append("\n");
 	                } else {
 	                	sb.append("0").append("}");
 	                	sb.append("0").append("}");
@@ -513,7 +665,7 @@ public class Crawler {
 	        	String name = w.findElement(By.cssSelector(".lPzHi, .info_detail>.tit")).getText();	            
 	        	String price = w.findElement(By.cssSelector(".GXS1X, .price")).getText();
 
-	        	sb.append(imgUrl + "]" + name + "]" + price).append("}");
+	        	sb.append(imgUrl + "\\\\" + name + "\\\\" + price).append("}");
 	        	count++;
 	        }
 	    	
@@ -554,6 +706,7 @@ public class Crawler {
 	            List<WebElement> reviewBenefits = driver.findElements(By.cssSelector(".MHaAm"));
 	            
 	            for (WebElement benefits : reviewBenefits) {
+	            	System.out.println(benefits.getText());
 	            	String keyword = benefits.findElement(By.cssSelector(".t3JSf")).getText(); 
 	            	String text = benefits.findElement(By.cssSelector(".CUoLy")).getText();
 	            	String cnt = text.replace("이 키워드를 선택한 인원", "").trim();  // "256"만 남기도록 텍스트를 대체합니다.
