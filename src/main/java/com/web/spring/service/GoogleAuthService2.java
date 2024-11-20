@@ -10,6 +10,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -28,32 +29,28 @@ public class GoogleAuthService2 {
 	Environment environment;
 	
 	@Value("${googleClientId}")
-	 private String googleOauthClientId ;
+	 private String ClientId ;
 	@Value("${googleClientSecret}")
-	 private String googleOauthClientSecret ;
+	 private String ClientSecret ;
 	@Value("${googleRedirectUri}") 
-	 private String googleOauthRedirectUri ;
+	 private String RedirectUri ;
 	@Value("${googleTokenUrl}")
-	 private String googleOauthTokenUrl ;
+	 private String TokenUrl ;
 	
 	 private String accessToken;
 	
 	@PostConstruct
 	public void init() {
-		System.out.println("googlOoauthClientId= "+googleOauthClientId);
-    	System.out.println("googleOauthClientSecret= "+googleOauthClientSecret);
-    	System.out.println("googleOauthRedirectUri= "+googleOauthRedirectUri);
-    	System.out.println("googleOauthTokenUrl= "+googleOauthTokenUrl);
+		System.out.println("ClientId= "+ClientId);
+    	System.out.println("ClientSecret= "+ClientSecret);
+    	System.out.println("RedirectUri= "+RedirectUri);
+    	System.out.println("TokenUrl= "+TokenUrl);
 	}
 		
    
 
     // Step 2: Google에서 반환한 code로 Access Token 교환
     public String exchangeCodeForToken(String code) {
-    	System.out.println("googlOoauthClientId= "+googleOauthClientId);
-    	System.out.println("googleOauthClientSecret= "+googleOauthClientSecret);
-    	System.out.println("googleOauthRedirectUri= "+googleOauthRedirectUri);
-    	System.out.println("googleOauthTokenUrl= "+googleOauthTokenUrl);
     	System.out.println("exchangeCodeForToken start");
         // RestTemplate에 필요한 메시지 변환기를 추가합니다.  
     	System.out.println("step 1");
@@ -62,9 +59,9 @@ public class GoogleAuthService2 {
         // 요청 파라미터를 map으로 준비합니다.
     	System.out.println("step 2");
     	MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add("client_id", googleOauthClientId);
-        params.add("client_secret", googleOauthClientSecret);
-        params.add("redirect_uri", googleOauthRedirectUri);
+        params.add("client_id", ClientId);
+        params.add("client_secret", ClientSecret);
+        params.add("redirect_uri", RedirectUri);
         params.add("code", code);
         params.add("grant_type", "authorization_code");
 
@@ -79,7 +76,7 @@ public class GoogleAuthService2 {
         // 실제 요청을 보내고 응답을 받음
         System.out.println("step 4");
         ResponseEntity<Map> response = restTemplate.exchange(
-        	googleOauthTokenUrl, 
+        		TokenUrl, 
             HttpMethod.POST, 
             request, 
             Map.class
@@ -133,10 +130,10 @@ public class GoogleAuthService2 {
 
 	public GoogleAuthService2(Environment environment) {
 		System.out.println("기본생성자 호출");
-		googleOauthClientId = environment.getProperty("googleOauthClientId");
-		googleOauthClientSecret = environment.getProperty("googleOauthClientSecret");
-		googleOauthRedirectUri = environment.getProperty("googleOauthRedirectUri");
-		googleOauthTokenUrl =  environment.getProperty("googleOauthTokenUrl");
+		//googleOauthClientId = environment.getProperty("googleOauthClientId");
+		//googleOauthClientSecret = environment.getProperty("googleOauthClientSecret");
+		//googleOauthRedirectUri = environment.getProperty("googleOauthRedirectUri");
+		//googleOauthTokenUrl =  environment.getProperty("googleOauthTokenUrl");
 	}
 	
 

@@ -36,6 +36,13 @@ public class MapAPI {
 	@Value("${tMapAppKey}")
 	private  String appKey; //티맵 API 앱 키
 	
+	@PostConstruct
+	public void init() {
+		System.out.println("clientId="+clientId);
+		System.out.println("clientSecret="+clientSecret);
+		System.out.println("appKey="+appKey);
+	}
+	
 	// 주소를 받아 위도와 경도를 반환
     public String getGeocode(String address) {
         try {

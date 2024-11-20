@@ -16,6 +16,8 @@ import org.springframework.web.client.RestTemplate;
 
 import com.web.spring.entity.User;
 
+import jakarta.annotation.PostConstruct;
+
 
 
 @Component
@@ -37,6 +39,14 @@ public class GoogleAuthService {
         this.RedirectUri = env.getProperty("googleRedirectUri");
         this.TokenUrl = env.getProperty("googleTokenUrl");
     }
+    
+    @PostConstruct
+	public void init() {
+		System.out.println("ClientId= "+ClientId);
+    	System.out.println("ClientSecret= "+ClientSecret);
+    	System.out.println("RedirectUri= "+RedirectUri);
+    	System.out.println("TokenUrl= "+TokenUrl);
+	}
 		
    
 
