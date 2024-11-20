@@ -1,5 +1,7 @@
 package com.web.spring.dto;
 
+import org.springframework.web.bind.annotation.RequestBody;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,13 +13,10 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class MenuReq {
-	private String nation;
-	private String category;
-	private String keyword;
-	private String soup;
-	private String selectName;
-	private String weather;
+public class RestaurantReq {
+	private String menu;
+	private String coreKeyword;
+	private String mainKeyword;
+	private String avgX;
+	private String avgY;
 }
-	
-	

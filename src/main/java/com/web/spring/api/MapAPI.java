@@ -17,6 +17,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -26,14 +27,13 @@ import lombok.extern.slf4j.Slf4j;
 @NoArgsConstructor
 @Builder
 @Slf4j
-@PropertySource("classpath:api-keys.properties")
 @Component
 public class MapAPI {
-	@Value("${clientId}")
+	@Value("${naverClientId}")
 	private  String clientId; // 네이버 API 클라이언트 ID
-	@Value("${clientSecret}")
+	@Value("${naverClientSecret}")
 	private  String clientSecret; // 네이버 API 비밀 키
-	@Value("${appKey}")
+	@Value("${tMapAppKey}")
 	private  String appKey; //티맵 API 앱 키
 	
 	// 주소를 받아 위도와 경도를 반환
@@ -41,7 +41,7 @@ public class MapAPI {
         try {
         	String addr = URLEncoder.encode(address, "UTF-8");
             String apiURL = "https://naveropenapi.apigw.ntruss.com/map-geocode/v2/geocode?query=" + addr;
-
+            
             URL url = new URL(apiURL);
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("GET");
@@ -62,21 +62,20 @@ public class MapAPI {
             while ((inputLine = br.readLine()) != null) {
                 response.append(inputLine);
             }
+            
             br.close();
 
             // JSON 응답을 처리
             JSONTokener tokener = new JSONTokener(response.toString());
             JSONObject object = new JSONObject(tokener);
+            System.out.println(object);
             JSONArray arr = object.getJSONArray("addresses");
 
+            
+            System.out.println("44444444");
             if (arr.length() > 0) {
                 JSONObject temp = (JSONObject) arr.get(0);
-                return new JSONObject()
-                    .put("roadAddress", temp.get("roadAddress"))
-                    .put("jibunAddress", temp.get("jibunAddress"))
-                    .put("latitude", temp.get("y"))
-                    .put("longitude", temp.get("x"))
-                    .toString();
+                return temp.get("x") + "," +  temp.get("y");
             } else {
                 return "주소를 찾을 수 없습니다.";
             }
@@ -157,10 +156,11 @@ public class MapAPI {
 
             // 응답을 String으로 변환하여 파싱
             String responseString = response.toString();  // 응답을 String으로 받기
-            System.out.println(responseString);  // 응답을 콘솔에 출력하여 확인
 
             JSONTokener tokener = new JSONTokener(responseString);  // 응답을 JSONTokener로 변환
             JSONObject object = new JSONObject(tokener);  // JSONObject로 파싱
+            
+            System.out.println(object);
 
             // 'distanceInfo'는 객체입니다.
             if (object.has("distanceInfo")) {

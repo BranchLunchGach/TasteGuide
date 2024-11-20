@@ -11,6 +11,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.google.gson.Gson;
@@ -29,8 +30,10 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter{
 	private final AuthenticationManager authenticationManager;
 	private final JWTUtil jwtUtil;
 	
+	
 	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
 			throws AuthenticationException{
+	log.info("attemptAuthentication start");
 	//1. 클라이언트 로그인 요청시 id, password 받아서 출력	
 	String username=super.obtainUsername(request);//id
 	String password = super.obtainPassword(request);//password
@@ -45,7 +48,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter{
 	log.info("authToken="+authToken);
 	//3. token을 ~Manager에 전달...Provoder...DetailsServicve...db연결...CustomMemberDetails생성..Back/Back/...
 	Authentication authentication=authenticationManager.authenticate(authToken);//CustomMemberDetails정보를 반환...
-	log.info("authentication{}",authentication);
+	log.info("authentication=====================!!!!!!!!!!!!==="+authentication);
 	return authentication;
 	}//
 	
