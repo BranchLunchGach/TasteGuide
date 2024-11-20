@@ -3,7 +3,7 @@ name: Build and Deploy
 on:
   push:
     branches:
-      - main #main에 푸쉬될때 트리거
+      - main # main에 푸쉬될때 트리거
 
 jobs:
   build:
