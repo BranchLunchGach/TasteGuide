@@ -3,7 +3,7 @@ name: Build and Deploy
 on:
   push:
     branches:
-      - believeme # believeme에 푸쉬될때 트리거
+      - main # main에 푸쉬될때 트리거
 
 jobs:
   build:
@@ -29,8 +29,9 @@ jobs:
           cache: 'maven'
 
       # 3. application.properties 설정 (GitHub secret로부터)
-      - name: Configure application.properties
+      - name: Create resources directory and configure application.properties
         run: |
+          mkdir -p src/main/resources  # src/main/resources 디렉토리 생성
           echo "${{ secrets.APPLICATION_PROPERTIES }}" > src/main/resources/application.properties
           
       - name: Verify application.properties
@@ -58,8 +59,8 @@ jobs:
       # 6. deploy 브랜치 체크아웃
       - name: Checkout deploy branch
         run: |
-          git config --global user.name "fly9702"
-          git config --global user.email "fiy9702@naver.com"
+          git config --global user.name "pleasebelieveme"
+          git config --global user.email "cain1227@naver.com"
           git checkout deploy || git checkout --orphan deploy
           git rm -rf .
 
@@ -69,10 +70,11 @@ jobs:
           cp -r target/spring-0.0.1-SNAPSHOT.war .
           rm -rf target
 
-      # 8. Git LFS로 WAR 파일 추가 및 푸시
-      - name: Force commit and push WAR file with Git LFS
+      # 8. AWS S3에 WAR 파일 업로드
+      - name: Upload WAR file to S3
         run: |
-          git lfs track "spring-0.0.1-SNAPSHOT.war"
-          git add .gitattributes spring-0.0.1-SNAPSHOT.war
-          git commit -m "Force deploy Spring Boot build files with Git LFS"
-          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/BranchLunchGach/TasteGuide.git deploy --force
+          aws s3 cp spring-0.0.1-SNAPSHOT.war s3://tasteguide/tasteguide.war
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
