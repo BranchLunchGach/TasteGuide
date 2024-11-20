@@ -33,8 +33,6 @@ jobs:
         run: |
           mkdir -p src/main/resources  # src/main/resources 디렉토리 생성
           echo "${{ secrets.APPLICATION_PROPERTIES }}" > src/main/resources/application.properties
-          echo "${{ secrets.APIKEYS_PROPERTIES }}" > src/main/resources/api-keys.properties
-          echo "${{ secrets.ENV }}" > .env
           
       - name: Verify application.properties
         run: cat src/main/resources/application.properties
