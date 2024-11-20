@@ -68,6 +68,7 @@ public class MapAPI {
             // JSON 응답을 처리
             JSONTokener tokener = new JSONTokener(response.toString());
             JSONObject object = new JSONObject(tokener);
+            System.out.println(object);
             JSONArray arr = object.getJSONArray("addresses");
 
             
