@@ -17,6 +17,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -26,14 +27,13 @@ import lombok.extern.slf4j.Slf4j;
 @NoArgsConstructor
 @Builder
 @Slf4j
-@PropertySource("classpath:api-keys.properties")
 @Component
 public class MapAPI {
-	@Value("${clientId}")
+	@Value("${naverClientId}")
 	private  String clientId; // 네이버 API 클라이언트 ID
-	@Value("${clientSecret}")
+	@Value("${naverClientSecret}")
 	private  String clientSecret; // 네이버 API 비밀 키
-	@Value("${appKey}")
+	@Value("${tMapAppKey}")
 	private  String appKey; //티맵 API 앱 키
 	
 	// 주소를 받아 위도와 경도를 반환
@@ -68,6 +68,7 @@ public class MapAPI {
             // JSON 응답을 처리
             JSONTokener tokener = new JSONTokener(response.toString());
             JSONObject object = new JSONObject(tokener);
+            System.out.println(object);
             JSONArray arr = object.getJSONArray("addresses");
 
             
@@ -158,6 +159,8 @@ public class MapAPI {
 
             JSONTokener tokener = new JSONTokener(responseString);  // 응답을 JSONTokener로 변환
             JSONObject object = new JSONObject(tokener);  // JSONObject로 파싱
+            
+            System.out.println(object);
 
             // 'distanceInfo'는 객체입니다.
             if (object.has("distanceInfo")) {

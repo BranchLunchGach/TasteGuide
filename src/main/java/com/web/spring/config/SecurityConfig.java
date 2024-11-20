@@ -3,8 +3,10 @@ package com.web.spring.config;
 import java.util.Arrays;
 import java.util.Collections;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -16,10 +18,12 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
+import com.google.api.client.util.Value;
 import com.web.spring.jwt.JWTFilter;
 import com.web.spring.jwt.JWTUtil;
 import com.web.spring.jwt.LoginFilter;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,14 +33,13 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 public class SecurityConfig {
-
+	
 
     //AuthenticationManager 가 인자로 받을 AuthenticationConfiguraion 객체 생성자
     private final AuthenticationConfiguration authenticationConfiguration;
     private final JWTUtil jwtUtil;
 
     //AuthenticationManager Bean 등록
-
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
@@ -60,7 +63,7 @@ public class SecurityConfig {
                             @Override
                             public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
                                 CorsConfiguration configuration = new CorsConfiguration();
-                                configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "https://tasteguide.site"));
+                                configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000","https://tasteguide.site"));
                                 configuration.setAllowedMethods(Collections.singletonList("*"));
                                 configuration.setAllowCredentials(true);
 
@@ -85,7 +88,7 @@ public class SecurityConfig {
         //경로별 인가 작업
         http.authorizeHttpRequests((auth) ->
                 auth
-                        .requestMatchers("/menu", "/users", "/users/**", "/boards","/mail","/findId","/updatePass","auth/google/code","auth/google/token", "/restaurant", "/hello-restaurant").permitAll()
+                        .requestMatchers("/menu", "/users", "/users/**", "/boards","/mail","/findId","/updatePass","auth/google/code","auth/google/token", "/restaurant", "/hello-restaurant", "/ai-restaurant").permitAll()
 
                         .requestMatchers("/swagger-ui", "/swagger-ui/**","/api/logistics","/api/swagger-config","/v3/api-docs/**").permitAll()
                         .requestMatchers("/admin").hasRole("ADMIN")
