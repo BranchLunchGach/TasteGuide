@@ -1,7 +1,6 @@
 package com.web.spring.controller;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
@@ -16,9 +15,11 @@ import com.web.spring.entity.Restaurant;
 import com.web.spring.service.RestaurantService;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 public class RestaurantController {
 	
 	private final RestaurantService restaurantService;
@@ -30,9 +31,13 @@ public class RestaurantController {
 		List<Restaurant> list = new ArrayList<>();
 		Queue<Restaurant> pq = new PriorityQueue<>();
 		
-		System.out.println("[RestaurantController] 실행중...");
-		pq = restaurantService.restaurantRecommend(restaurantReq.getMenu(), restaurantReq.getCoreKeyword(), restaurantReq.getMainKeyword(), restaurantReq.getAvgX(), restaurantReq.getAvgY());
-		System.out.println("[RestaurantController] 실행끝...");
+		log.info("[RestaurantController] /restaurant 실행중...");
+		try {
+			pq = restaurantService.restaurantRecommend(restaurantReq.getMenu(), restaurantReq.getCoreKeyword(), restaurantReq.getMainKeyword(), restaurantReq.getAvgX(), restaurantReq.getAvgY());
+		} catch (Exception e) {
+			log.error(e.getMessage());
+		}
+		log.info("[RestaurantController] /restaurant 실행끝...");
 		list.add(pq.poll());
 		list.add(pq.poll());
 		list.add(pq.poll());
@@ -41,7 +46,6 @@ public class RestaurantController {
 		list.add(pq.poll());
 		
 		long end = System.currentTimeMillis();
-		System.out.println("걸린시간 : " + (end-start) + "ms");
 		
 		return ResponseEntity.status(201).body(list);
 	}
@@ -49,42 +53,34 @@ public class RestaurantController {
 	@PostMapping("/hello-restaurant")
 	public ResponseEntity<?> helloRecommend(@RequestBody RestaurantReq restaurantReq) {
 		
-		long start = System.currentTimeMillis();
 		List<Restaurant> list = new ArrayList<>();
 		Queue<Restaurant> pq = new PriorityQueue<>();
 		
-		System.out.println("[RestaurantController] 실행중...");
+		log.info("[RestaurantController] /hello-restaurant 실행중...");
 		pq = restaurantService.helloRecommend(restaurantReq.getMenu(), restaurantReq.getAvgX(), restaurantReq.getAvgY());
-		System.out.println("[RestaurantController] 실행끝...");
+		log.info("[RestaurantController] /hello-restaurant 실행중...");
 		list.add(pq.poll());
 		list.add(pq.poll());
 		list.add(pq.poll());
 		list.add(pq.poll());
 		list.add(pq.poll());
 		list.add(pq.poll());
-		
-		long end = System.currentTimeMillis();
-		System.out.println("걸린시간 : " + (end-start) + "ms");
-		
+
 		return ResponseEntity.status(201).body(list);
 	}
 	
 	@PostMapping("/ai-restaurant")
 	public ResponseEntity<?> aiRecommend(@RequestBody RestaurantReq restaurantReq) {
 		
-		long start = System.currentTimeMillis();
 		List<Restaurant> list = new ArrayList<>();
 		Queue<Restaurant> pq = new PriorityQueue<>();
 		
-		System.out.println("[RestaurantController] 실행중...");
+		log.info("[RestaurantController] /ai-restaurant 실행중...");
 		pq = restaurantService.aiRecommend(restaurantReq.getMenu());
-		System.out.println("[RestaurantController] 실행끝...");
+		log.info("[RestaurantController] /ai-restaurant 실행중...");
 		list.add(pq.poll());
 		list.add(pq.poll());
 		list.add(pq.poll());
-
-		long end = System.currentTimeMillis();
-		System.out.println("걸린시간 : " + (end-start) + "ms");
 		
 		return ResponseEntity.status(201).body(list);
 	}

@@ -1,7 +1,6 @@
 package com.web.spring.service;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
@@ -14,7 +13,9 @@ import com.web.spring.api.MapAPI;
 import com.web.spring.entity.Restaurant;
 
 import io.jsonwebtoken.lang.Arrays;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 public class RestaurantService {
 	
@@ -29,16 +30,15 @@ public class RestaurantService {
 		// Headless
 		long startTime = System.currentTimeMillis();
 		Crawler crawler = new Crawler(10);
-		List<String> lists = crawler.reviewCrawling(menu); //String 하나가 가게 하나의 모든 정보..
 		
-		System.out.println("크롤링 데이터 사이즈 : " + lists.size());
+		log.info("[restaurantRecommend] 시작!!");
+		
+		List<String> lists = crawler.reviewCrawling(menu); //String 하나가 가게 하나의 모든 정보..	
 		
 		// 크롤링한 데이터로 Restaurant 객체 생성
 		for (String data : lists) {
 			String[] datas = data.split("}");
-			
-			System.out.println(">>>>>>>>>>>>>>>>>>>>>> [가중치 계산중...] <<<<<<<<<<<<<<<<<<<<<\n " + data);			
-			
+						
 			boolean dayOff = false;
 			int score = 0;
 			List<String> menus = new ArrayList<>();
@@ -51,7 +51,6 @@ public class RestaurantService {
 			for (int i = 5; i <= 9; i++)
 				menus.add(datas[i]);
 			
-			System.out.println("메뉴 저장 성공!");
 			
 			//키워드 리뷰 10개 13~22
 			if (!datas[13].equals("0")) {
@@ -61,7 +60,6 @@ public class RestaurantService {
 						keywordReviews.add(str[0]);
 						keywordReviewCnts.add(Integer.parseInt(str[1])); //해당 키워드를 입력한 사람의 수를 대입
 					} catch(ArrayIndexOutOfBoundsException e) {
-						System.out.println("키워드 리뷰를 불러오지 못해 0을 대입...");
 						keywordReviews.add("0");
 					}
 				}
@@ -74,10 +72,6 @@ public class RestaurantService {
 			for (int i = 23; i <= 27; i++) {
 				textReviews.add(datas[i]);
 			}
-			
-			// test 로그
-			for (String k : keywordReviews)
-				System.out.println(k);
 			
 			//키워드 리뷰 전체 갯수 구하기.
 			for (Integer cnt : keywordReviewCnts)
@@ -111,15 +105,12 @@ public class RestaurantService {
 			}
 			
 			//
-			System.out.println("매장이 청결해요 여부: " +  keywordReviews.contains("매장이청결해요"));
 			if(keywordReviews.contains("매장이청결해요")) {
-				System.out.println("매장이 청결해요 !! 점수는 ?  :: " + reviewScore("매장이청결해요", keywordReviews, keywordReviewCnts, keywordReviewCnt));
 				score += reviewScore("매장이청결해요", keywordReviews, keywordReviewCnts, keywordReviewCnt);
 			}
 			
 			//mainKeyword 가중치 부여
 			if(mainKeywords != null) {
-				System.out.println("mainKeyword 가중치 부여 시작");
 				List<String> mainKeyword = Arrays.asList(mainKeywords.replaceAll(" ", "").split(","));
 				for(String k : mainKeyword) {
 
@@ -175,16 +166,10 @@ public class RestaurantService {
 				}
 			}
 			
-			System.out.println("mainKeyword 가중치 부여 끝");
-			
-			
 			//거리에 따른 가중치 부여
 			String address = mapAPI.getGeocode(datas[3]);
-			System.out.println("datas[3] >> " + datas[3]);
-			System.out.println("address >> " + address);
 			String endX = address.split(",")[0];
 			String endY = address.split(",")[1];
-			System.out.println(startX + ", " + startY + ", " + endX + ", " + endY);
 			String strDistance = mapAPI.getLinearDistance(startX, startY, endX, endY);
 			int distance = Integer.parseInt(strDistance);
 			
@@ -205,11 +190,7 @@ public class RestaurantService {
 			Restaurant restaurant = new Restaurant(datas[0], datas[1], dayOff, datas[3], datas[4], menus, datas[10], datas[11], datas[12], keywordReviews, textReviews, datas[28], datas[29], datas[30], distance, score);
 			
 			pq.add(restaurant);
-		}
-		
-		long endTime = System.currentTimeMillis();
-		
-		System.out.println("크롤링 걸린 시간 + 데이터 가공 : " + (endTime-startTime) + "ms");
+		}	
 		
 		crawler.close();
 		
@@ -229,9 +210,6 @@ public class RestaurantService {
 				
 				String[] datas = data.split("}");
 				
-				for (String d : datas)
-					System.out.println(d);
-				
 				boolean dayOff = false;
 				int score = 0;
 				List<String> menus = new ArrayList<>();
@@ -241,8 +219,7 @@ public class RestaurantService {
 				
 				//메뉴 5가지 저장
 				for (int i = 5; i <= 9; i++)
-					menus.add(datas[i]);
-				System.out.println("메뉴 저장 지났씁니다~");			
+					menus.add(datas[i]);		
 				
 				//키워드 리뷰 10개 저장 (13~22)
 				if (!datas[13].equals("0")) {
@@ -257,8 +234,6 @@ public class RestaurantService {
 					}
 				}
 				
-				System.out.println("키워드 리뷰 저장 지났씁니다~");
-				
 				for (int i = 23; i <= 27; i++) {
 					textReviews.add(datas[i]);
 				}
@@ -269,14 +244,11 @@ public class RestaurantService {
 					score -= 4000000;
 				}
 				
-				System.out.println("리뷰 개수 구하기 전!");
 				int totalReviewCnt = Integer.parseInt(datas[11]) + Integer.parseInt(datas[12]);
 				score += totalReviewCnt;
 				
 				//거리 구하기
-				System.out.println(datas[3]);
 				String address = mapAPI.getGeocode(datas[3]);
-				System.out.println(address);
 				String endX = address.split(",")[0];
 				String endY = address.split(",")[1];
 				String strDistance = mapAPI.getLinearDistance(avgX, avgY, endX, endY);
@@ -296,6 +268,8 @@ public class RestaurantService {
 		// 0:매장 이름 } 1:오늘 휴무 } 2:영업 시간 } 3~7:메뉴명 5개 } 8 : 점수
 		public Queue<Restaurant> aiRecommend(String menu) {
 			
+			log.info("[RestaurantService] aiRecommend 실행 중...");
+			
 			Queue<Restaurant> pq = new PriorityQueue<>();
 
 			Crawler crawler = new Crawler(6);
@@ -304,12 +278,7 @@ public class RestaurantService {
 			// 크롤링한 데이터로 Restaurant 객체 생성
 			for (String data : lists) {
 				
-				System.out.println("data >> " + data);
-				
 				String[] datas = data.split("}");
-				
-				for (String d : datas)
-					System.out.println(d);
 				
 				boolean dayOff = false;
 				int score = 0;
@@ -318,7 +287,6 @@ public class RestaurantService {
 				//메뉴 5가지 저장
 				for (int i = 3; i <= 7; i++)
 					menus.add(datas[i]);
-				System.out.println("[AI] 메뉴 저장 지났씁니다~");	
 				
 				if(datas[1].equals("오늘 휴무")) {
 					dayOff = true;
@@ -330,6 +298,8 @@ public class RestaurantService {
 					
 				pq.add(restaurant);
 			}
+			
+			log.info("[RestaurantController] aiRecommend 실행 끝 ...");
 						
 			crawler.close();
 			
