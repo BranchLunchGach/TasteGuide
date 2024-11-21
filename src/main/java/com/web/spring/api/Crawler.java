@@ -19,7 +19,9 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class Crawler {
 	// ChromeDriver 초기화
 		int count = 0;
@@ -40,6 +42,7 @@ public class Crawler {
 	    public Crawler(int count) {
 	    	this.count = count;
 	    	
+	    	log.info("[Crawler] 생성 중...");
 	    	options = new ChromeOptions();
 	        //options.addArguments("--headless"); // headless 모드 활성화
 	    	//이놈이 핵심 옵션..
@@ -58,6 +61,7 @@ public class Crawler {
 	    	wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 	    	sb = new StringBuilder();
 	    	WebDriverManager.chromedriver().setup();  
+	    	log.info("[Crawler] 생성 완료...");
 	    }
 	    
 	    public List<String> aiRecommend(String keyword) {
@@ -99,18 +103,15 @@ public class Crawler {
 	                	try {
 		                	button = driver.findElement(By.cssSelector("span.U7pYf"));
 		                	((JavascriptExecutor) driver).executeScript("arguments[0].click();", button);
-			                System.out.println("[AI]영업시간 클릭 완료!!");
 			                isClick = true;
 			                break;
 		                } catch (NoSuchElementException e) {
-		                	System.out.println("[AI] 영업시간 클릭 실패.. 재시도 진행...");
 		                	Thread.sleep(1000);
 		                	btnCnt++;
 		                }
 	                }
 	                
 	                if (!isClick) {
-	                	System.out.println("[AI] 영업시간 클릭 실패로 다음 요소로 진행...");
 	                	frameChange(driver, wait, "searchIframe");
 		                sb.setLength(0);	
 		                continue;
@@ -120,13 +121,10 @@ public class Crawler {
 	                Thread.sleep(2000);
 	                
 	                List<WebElement> openTime = driver.findElements(By.cssSelector("div.w9QyJ div.H3ua4"));
-	                System.out.println("[AI] openTime size() >> " + openTime.size());
 	                
 	                if(openTime.size() == 1)
-//	                	System.out.println("[AI] openTime size 1일때의 값... >> " + openTime.get(0).getText());
 	                	sb.append(openTime.get(0).getText()).append("}");
 	                else 
-//	                	System.out.println("[AI] openTime size의 값... >> " + openTime.get(1).getText());
 	                	sb.append(openTime.get(1).getText()).append("}");
 	                
 	                // ======================== 메뉴 탭 클릭 부분 ========================
@@ -134,12 +132,10 @@ public class Crawler {
 	                	WebElement menuTab = getTab(driver, "메뉴"); 
 	                	tabClickAndActiveCheck(driver, menuTab);
 	                } catch (NullPointerException e) {
-	                	System.out.println("탭이 존재하지 않아 불가피하게 종료...");
 	                	sb.setLength(0);
 	                	frameChange(driver, wait, "searchIframe");
 	                	continue;
 	                } catch (StaleElementReferenceException e) {
-	                	System.out.println("해당 요소가 존재하지 않아? 불가피하게 종료...");
 	                	sb.setLength(0);
 	                	frameChange(driver, wait, "searchIframe");
 	                	continue;
@@ -225,10 +221,13 @@ public class Crawler {
 		public List<String> reviewCrawling(String keyword) { 
 			
 	        try {
-	        	Thread.sleep(1000);        	           
+	        	Thread.sleep(1000); 
+	        	log.info("[Crawler] reviewCrawling 실행중이지비");
 	            
 	            // JavaScript로 검색어를 입력
 	        	keywordSearch(driver, wait, keyword);    
+	        	
+	        	log.info("[Crawler] reviewCrawling 네이버 검색 진행 후 가게 찾으러 가기");
 	            
 	            // 가게 이름 요소를 두 가지 경우에 맞게 찾기
 	            List<WebElement> shopLinks = wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.cssSelector("div>.place_bluelink>.TYaxT, div.place_bluelink.C6RjW > span.YwYLL")));
@@ -240,8 +239,7 @@ public class Crawler {
 	            for (int i = 0; i < Math.min(count, shopLinks.size()); i++) {
 	                WebElement shop = shopLinks.get(i);
 	                
-	                WebElement shopType = driver.findElement(By.cssSelector("span.KCMnt"));
-	                System.out.println(shop.getText()); //매장 이름	               
+	                WebElement shopType = driver.findElement(By.cssSelector("span.KCMnt"));               
 	                
 	                sb.append(shop.getText()).append("}"); //sb.append("[매장 이름] : " + shop.getText()).append("\n");
 	                sb.append(shopType.getText()).append("}"); //sb.append("[매장 타입] : " + shopType.getText()).append("\n");
@@ -286,17 +284,17 @@ public class Crawler {
 	                	WebElement menuTab = getTab(driver, "메뉴"); 
 	                	tabClickAndActiveCheck(driver, menuTab);
 	                } catch (NullPointerException e) {
-	                	System.out.println("탭이 존재하지 않아 불가피하게 종료...");
+	                	log.info("[Crawler] 메뉴 탭이 존재하지 않아 불가피하게 종료...");
 	                	sb.setLength(0);
 	                	frameChange(driver, wait, "searchIframe");
 	                	continue;
 	                } catch (StaleElementReferenceException e) {
-	                	System.out.println("해당 요소가 존재하지 않아? 불가피하게 종료...");
+	                	log.info("[Crawler] 메뉴 관련 요소가 존재하지 않아 불가피하게 종료...");
 	                	sb.setLength(0);
 	                	frameChange(driver, wait, "searchIframe");
 	                	continue;
 	                } catch (JavascriptException e) {
-	                	System.out.println("클릭할 수 없어 불가피하게 종료...");
+	                	log.info("[Crawler] 메뉴 관련 클릭 에러로 불가피하게 종료...");
 	                	sb.setLength(0);
 	                	frameChange(driver, wait, "searchIframe");
 	                	continue;
@@ -311,12 +309,12 @@ public class Crawler {
 	                	// 리뷰 탭 클릭 및 활성화 확인
 		                tabClickAndActiveCheck(driver, reviewTab);  
 	                } catch (NullPointerException e) {
-	                	System.out.println("탭이 존재하지 않아 불가피하게 종료...");
+	                	log.info("[Crawler] 리뷰 탭이 존재하지 않아 불가피하게 종료...");
 	                	sb.setLength(0);
 	                	frameChange(driver, wait, "searchIframe");
 	                	continue;
 	                } catch (JavascriptException e) {
-	                	System.out.println("클릭할 수 없어 불가피하게 종료...");
+	                	log.info("[Crawler] 리뷰 관련 클릭에러로 불가피하게 종료...");
 	                	sb.setLength(0);
 	                	frameChange(driver, wait, "searchIframe");
 	                	continue;
@@ -384,7 +382,7 @@ public class Crawler {
 	            return infos;
 	            
 	        } catch (Exception e) {
-	            e.printStackTrace();
+	            log.error("[restaurantRecommend] {}", e);
 	        } 
 	        
 	        return null;
