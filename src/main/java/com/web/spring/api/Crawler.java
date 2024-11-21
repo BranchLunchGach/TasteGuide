@@ -80,6 +80,8 @@ public class Crawler {
 	            for (int i = 0; i < Math.min(count, shopLinks.size()); i++) {
 	                WebElement shop = shopLinks.get(i);
 	                
+	                sb.append(shop.getText()).append("}"); //sb.append("[매장 이름] : " + shop.getText()).append("\n");
+	                
 	                detailPageActiveCheck(driver, shop);
 	                
 	                frameChangeByEntryIframe(driver, wait);
