@@ -171,10 +171,15 @@ public class RestaurantService {
 			
 			log.info("[RestaurantService] restaurantRecommend() : {} 메인 키워드 가중치 끝 & 거리 가중치 시작...", datas[0]);
 			
-			//거리에 따른 가중치 부여
+//			거리에 따른 가중치 부여
 			String address = mapAPI.getGeocode(datas[3]);
 			String endX = address.split(",")[0];
 			String endY = address.split(",")[1];
+			
+			System.out.println("startX >> " + startX);
+			System.out.println("startY >> " + startY);
+			System.out.println("endX >> " + endX);
+			System.out.println("endY >> " + endY);
 			String strDistance = mapAPI.getLinearDistance(startX, startY, endX, endY);
 			int distance = Integer.parseInt(strDistance);
 			
@@ -193,7 +198,7 @@ public class RestaurantService {
 			//가중치 로직 끝...
 
 			log.info("[RestaurantService] restaurantRecommend() : {} 데이터 가공 끝 & Restaurant 객체 생성 후 Queue.add()", datas[0]);
-			Restaurant restaurant = new Restaurant(datas[0], datas[1], dayOff, datas[3], datas[4], menus, datas[10], datas[11], datas[12], keywordReviews, textReviews, datas[28], datas[29], datas[30], distance, score);
+			Restaurant restaurant = new Restaurant(datas[0], datas[1], dayOff, datas[3], datas[4], menus, datas[10], datas[11], datas[12], keywordReviews, textReviews, datas[28], datas[29], datas[30], 0, score);
 			
 			pq.add(restaurant);
 		}	
