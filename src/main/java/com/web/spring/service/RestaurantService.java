@@ -273,7 +273,7 @@ public class RestaurantService {
 				Restaurant restaurant = new Restaurant(datas[0], datas[1], dayOff, datas[3], datas[4], menus, datas[10], datas[11], datas[12], keywordReviews, textReviews, datas[28], datas[29], datas[30], distance, score);
 				
 				pq.add(restaurant);
-		}
+			}
 						
 			crawler.close();
 			
@@ -295,6 +295,12 @@ public class RestaurantService {
 			for (String data : lists) {
 				
 				String[] datas = data.split("}");
+				
+				int c = 1;
+				for (String d : datas) {
+					log.info("[{} 번째 DATA] {}", c, d);
+					c++;
+				}
 				
 				boolean dayOff = false;
 				int score = 0;
