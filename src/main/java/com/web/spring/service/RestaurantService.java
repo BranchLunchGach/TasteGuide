@@ -25,19 +25,19 @@ public class RestaurantService {
 	// ======================= 식당 3개 추천 기능 =======================
 	public Queue<Restaurant> restaurantRecommend(String menu, String coreKeywords, String mainKeywords, String startX, String startY) {
 		
+		log.info("[RestaurantService] restaurantRecommend() 시작!!");
+		
 		Queue<Restaurant> pq = new PriorityQueue<>();
 		
-		// Headless
-		long startTime = System.currentTimeMillis();
-		Crawler crawler = new Crawler(10);
-		
-		log.info("[restaurantRecommend] 시작!!");
+		Crawler crawler = new Crawler(10);	
 		
 		List<String> lists = crawler.reviewCrawling(menu); //String 하나가 가게 하나의 모든 정보..	
 		
 		// 크롤링한 데이터로 Restaurant 객체 생성
 		for (String data : lists) {
 			String[] datas = data.split("}");
+			
+			log.info("[RestaurantService] restaurantRecommend() : {} 데이터 가공 시작", datas[0]);
 						
 			boolean dayOff = false;
 			int score = 0;
@@ -51,6 +51,7 @@ public class RestaurantService {
 			for (int i = 5; i <= 9; i++)
 				menus.add(datas[i]);
 			
+			log.info("[RestaurantService] restaurantRecommend() : {} 키워드 리뷰 가공중...", datas[0]);
 			
 			//키워드 리뷰 10개 13~22
 			if (!datas[13].equals("0")) {
@@ -76,6 +77,8 @@ public class RestaurantService {
 			//키워드 리뷰 전체 갯수 구하기.
 			for (Integer cnt : keywordReviewCnts)
 				keywordReviewCnt += cnt;		
+			
+			log.info("[RestaurantService] restaurantRecommend() : {} 가중치 로직 시작...", datas[0]);
 			
 			//가중치 로직 시작...
 			if(datas[2].equals("오늘 휴무")) {
@@ -166,6 +169,8 @@ public class RestaurantService {
 				}
 			}
 			
+			log.info("[RestaurantService] restaurantRecommend() : {} 메인 키워드 가중치 끝 & 거리 가중치 시작...", datas[0]);
+			
 			//거리에 따른 가중치 부여
 			String address = mapAPI.getGeocode(datas[3]);
 			String endX = address.split(",")[0];
@@ -187,6 +192,7 @@ public class RestaurantService {
 			
 			//가중치 로직 끝...
 
+			log.info("[RestaurantService] restaurantRecommend() : {} 데이터 가공 끝 & Restaurant 객체 생성 후 Queue.add()", datas[0]);
 			Restaurant restaurant = new Restaurant(datas[0], datas[1], dayOff, datas[3], datas[4], menus, datas[10], datas[11], datas[12], keywordReviews, textReviews, datas[28], datas[29], datas[30], distance, score);
 			
 			pq.add(restaurant);
@@ -200,15 +206,19 @@ public class RestaurantService {
 	// ======================= 만남의 장소 식당 3개 추천 기능 =======================
 		public Queue<Restaurant> helloRecommend(String menu, String avgX, String avgY) {
 			
+			log.info("[RestaurantService] helloRecommend() 시작!!");
+			
 			Queue<Restaurant> pq = new PriorityQueue<>();
 
 			Crawler crawler = new Crawler(10);
 			List<String> lists = crawler.hello(menu, avgX, avgY); //String 하나가 가게 하나의 모든 정보..
 						
 			// 크롤링한 데이터로 Restaurant 객체 생성
-			for (String data : lists) {
+			for (String data : lists) {			
 				
 				String[] datas = data.split("}");
+				
+				log.info("[RestaurantService] helloRecommend() : {} 데이터 가공 시작", datas[0]);
 				
 				boolean dayOff = false;
 				int score = 0;
@@ -220,6 +230,8 @@ public class RestaurantService {
 				//메뉴 5가지 저장
 				for (int i = 5; i <= 9; i++)
 					menus.add(datas[i]);		
+				
+				log.info("[RestaurantService] helloRecommend() : {} 키워드 리뷰 가공중...", datas[0]);
 				
 				//키워드 리뷰 10개 저장 (13~22)
 				if (!datas[13].equals("0")) {
@@ -238,6 +250,8 @@ public class RestaurantService {
 					textReviews.add(datas[i]);
 				}
 				
+				log.info("[RestaurantService] helloRecommend() : {} 가중치 로직 시작...", datas[0]);
+				
 				//가중치 로직 시작...
 				if(datas[2].equals("오늘 휴무")) {
 					dayOff = true;
@@ -253,6 +267,8 @@ public class RestaurantService {
 				String endY = address.split(",")[1];
 				String strDistance = mapAPI.getLinearDistance(avgX, avgY, endX, endY);
 				int distance = Integer.parseInt(strDistance);
+				
+				log.info("[RestaurantService] helloRecommend() : {} 가중치 로직 끝 & Restaurant 객체 생성 후 Queue.add()", datas[0]);
 
 				Restaurant restaurant = new Restaurant(datas[0], datas[1], dayOff, datas[3], datas[4], menus, datas[10], datas[11], datas[12], keywordReviews, textReviews, datas[28], datas[29], datas[30], distance, score);
 				
