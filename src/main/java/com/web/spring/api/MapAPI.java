@@ -127,7 +127,7 @@ public class MapAPI {
     // 두 지점 간의 직선 거리 데이터 반환
     public String getLinearDistance(String startX, String startY, String endX, String endY) {
     	try {
-            String apiURL = "https://apis.openapi.sk.com/tmap/routes/distance?startX="+startX+"&startY="+startY+"&endX="+endX+"&endY="+endY;
+            String apiURL = "https://apis.openapi.sk.com/tmap/routes/distance?version=1&startX="+startX+"&startY="+startY+"&endX="+endX+"&endY="+endY;
 
             URL url = new URL(apiURL);
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
