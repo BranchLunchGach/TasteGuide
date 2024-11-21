@@ -11,29 +11,38 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.web.spring.api.MapAPI;
 import com.web.spring.dto.RestaurantReq;
 import com.web.spring.entity.Restaurant;
 import com.web.spring.service.RestaurantService;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@CrossOrigin
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 public class RestaurantController {
 	
 	private final RestaurantService restaurantService;
 	
 	@PostMapping("/restaurant")
 	public ResponseEntity<?> restaurantRecommend(@RequestBody RestaurantReq restaurantReq) {
-		
+
 		List<Restaurant> list = new ArrayList<>();
 		Queue<Restaurant> pq = new PriorityQueue<>();
 		
-		System.out.println("[RestaurantController] 실행중...");
-		System.out.println("menu: " + restaurantReq.getMenu() + ", coreKeyword: " + restaurantReq.getCoreKeyword() + ", mainKeyword: " + restaurantReq.getMainKeyword());
-		pq = restaurantService.restaurantRecommend(restaurantReq.getMenu(), restaurantReq.getCoreKeyword(), restaurantReq.getMainKeyword());
-		System.out.println("[RestaurantController] 실행끝...");
+		log.info("[RestaurantController] /restaurant 실행중...");
+		try {
+			pq = restaurantService.restaurantRecommend(restaurantReq.getMenu(), restaurantReq.getCoreKeyword(), restaurantReq.getMainKeyword(), restaurantReq.getAvgX(), restaurantReq.getAvgY());
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			log.error("[RestaurantController] /restaurant 실행 실패...");
+		}
+		log.info("[RestaurantController] /restaurant 실행끝...");
+		list.add(pq.poll());
+		list.add(pq.poll());
+		list.add(pq.poll());
 		list.add(pq.poll());
 		list.add(pq.poll());
 		list.add(pq.poll());
@@ -44,19 +53,46 @@ public class RestaurantController {
 	@PostMapping("/hello-restaurant")
 	public ResponseEntity<?> helloRecommend(@RequestBody RestaurantReq restaurantReq) {
 		
-		long start = System.currentTimeMillis();
 		List<Restaurant> list = new ArrayList<>();
 		Queue<Restaurant> pq = new PriorityQueue<>();
 		
-		System.out.println("[RestaurantController] 실행중...");
-		pq = restaurantService.helloRecommend(restaurantReq.getMenu(), restaurantReq.getAvgX(), restaurantReq.getAvgY());
-		System.out.println("[RestaurantController] 실행끝...");
-		list.add(pq.poll());
-		list.add(pq.poll());
-		list.add(pq.poll());
+		log.info("[RestaurantController] /hello-restaurant 실행중...");
+		try {
+			pq = restaurantService.helloRecommend(restaurantReq.getMenu(), restaurantReq.getAvgX(), restaurantReq.getAvgY());
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			log.error("[RestaurantController] /hello-restaurant 실행 실패...");
+		}
 		
-		long end = System.currentTimeMillis();
-		System.out.println("걸린시간 : " + (end-start) + "ms");
+		log.info("[RestaurantController] /hello-restaurant 실행끝...");
+		list.add(pq.poll());
+		list.add(pq.poll());
+		list.add(pq.poll());
+		list.add(pq.poll());
+		list.add(pq.poll());
+		list.add(pq.poll());
+
+		return ResponseEntity.status(201).body(list);
+	}
+	
+	@PostMapping("/ai-restaurant")
+	public ResponseEntity<?> aiRecommend(@RequestBody RestaurantReq restaurantReq) {
+		
+		List<Restaurant> list = new ArrayList<>();
+		Queue<Restaurant> pq = new PriorityQueue<>();
+		
+		log.info("[RestaurantController] /ai-restaurant 실행중...");
+		try {
+			pq = restaurantService.aiRecommend(restaurantReq.getMenu());
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			log.error("[RestaurantController] /ai-restaurant 실행실패...");
+		}
+		
+		log.info("[RestaurantController] /ai-restaurant 실행끝...");
+		list.add(pq.poll());
+		list.add(pq.poll());
+		list.add(pq.poll());
 		
 		return ResponseEntity.status(201).body(list);
 	}

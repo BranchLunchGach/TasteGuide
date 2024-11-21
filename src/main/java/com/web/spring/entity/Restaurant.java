@@ -15,7 +15,7 @@ import lombok.ToString;
 @ToString
 public class Restaurant implements Comparable<Restaurant> {
 	private String restaurantName; //매장 이름
-	private String restaurantType; //매장 타입
+	private String restaurantType; //매장 타입 & AI추천에서는 영업시
 	private boolean dayOff; //휴무 유무
 	private String address; //매장 도로명 주소
 	private String subwayAddress; //매장 근처 지하철역
@@ -31,6 +31,14 @@ public class Restaurant implements Comparable<Restaurant> {
 	
 	private int restauranDistance; //현재 위치와 해당 레스토랑의 거리
 	private int score; //가중치
+		
+	public Restaurant(String restaurantName, String restaurantType, boolean dayOff, List<String> menus, int score) {
+		this.restaurantName = restaurantName;
+		this.restaurantType = restaurantType;
+		this.dayOff = dayOff;
+		this.menus = menus;
+		this.score = score;
+	}
 	
 	@Override
 	public int compareTo(Restaurant o) {

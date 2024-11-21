@@ -127,12 +127,6 @@
 		    <artifactId>java-jwt</artifactId>
 		    <version>4.2.1</version>
 		</dependency>
-		<dependency>
-	        <groupId>io.github.cdimascio</groupId>
-	        <artifactId>java-dotenv</artifactId>
-	        <version>5.2.2</version> <!-- 최신 버전으로 변경 가능 -->
-	    </dependency>
-
 		
 		<!-- https://mvnrepository.com/artifact/org.json/json -->
 		<dependency>
@@ -176,6 +170,11 @@
             <classifier>models</classifier>
         </dependency>
         <!-- 크롤링 관련... -->
+        <!-- OAuth2 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-oauth2-client</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>
