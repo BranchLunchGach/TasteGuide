@@ -28,7 +28,7 @@ public class RestaurantService {
 		
 		// Headless
 		long startTime = System.currentTimeMillis();
-		Crawler crawler = new Crawler(10, 0);
+		Crawler crawler = new Crawler(10);
 		List<String> lists = crawler.reviewCrawling(menu); //String 하나가 가게 하나의 모든 정보..
 		
 		System.out.println("크롤링 데이터 사이즈 : " + lists.size());
@@ -180,6 +180,8 @@ public class RestaurantService {
 			
 			//거리에 따른 가중치 부여
 			String address = mapAPI.getGeocode(datas[3]);
+			System.out.println("datas[3] >> " + datas[3]);
+			System.out.println("address >> " + address);
 			String endX = address.split(",")[0];
 			String endY = address.split(",")[1];
 			System.out.println(startX + ", " + startY + ", " + endX + ", " + endY);
@@ -219,7 +221,7 @@ public class RestaurantService {
 			
 			Queue<Restaurant> pq = new PriorityQueue<>();
 
-			Crawler crawler = new Crawler(10, 0);
+			Crawler crawler = new Crawler(10);
 			List<String> lists = crawler.hello(menu, avgX, avgY); //String 하나가 가게 하나의 모든 정보..
 						
 			// 크롤링한 데이터로 Restaurant 객체 생성
@@ -296,7 +298,7 @@ public class RestaurantService {
 			
 			Queue<Restaurant> pq = new PriorityQueue<>();
 
-			Crawler crawler = new Crawler(5, 0);
+			Crawler crawler = new Crawler(6);
 			List<String> lists = crawler.aiRecommend(menu); //String 하나가 가게 하나의 모든 정보..
 						
 			// 크롤링한 데이터로 Restaurant 객체 생성
