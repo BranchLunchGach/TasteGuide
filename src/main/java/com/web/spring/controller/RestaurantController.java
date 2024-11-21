@@ -26,8 +26,7 @@ public class RestaurantController {
 	
 	@PostMapping("/restaurant")
 	public ResponseEntity<?> restaurantRecommend(@RequestBody RestaurantReq restaurantReq) {
-		
-		long start = System.currentTimeMillis();
+
 		List<Restaurant> list = new ArrayList<>();
 		Queue<Restaurant> pq = new PriorityQueue<>();
 		
@@ -36,6 +35,7 @@ public class RestaurantController {
 			pq = restaurantService.restaurantRecommend(restaurantReq.getMenu(), restaurantReq.getCoreKeyword(), restaurantReq.getMainKeyword(), restaurantReq.getAvgX(), restaurantReq.getAvgY());
 		} catch (Exception e) {
 			log.error(e.getMessage());
+			log.error("[RestaurantController] /restaurant 실행 실패...");
 		}
 		log.info("[RestaurantController] /restaurant 실행끝...");
 		list.add(pq.poll());
@@ -44,8 +44,6 @@ public class RestaurantController {
 		list.add(pq.poll());
 		list.add(pq.poll());
 		list.add(pq.poll());
-		
-		long end = System.currentTimeMillis();
 		
 		return ResponseEntity.status(201).body(list);
 	}
@@ -57,8 +55,14 @@ public class RestaurantController {
 		Queue<Restaurant> pq = new PriorityQueue<>();
 		
 		log.info("[RestaurantController] /hello-restaurant 실행중...");
-		pq = restaurantService.helloRecommend(restaurantReq.getMenu(), restaurantReq.getAvgX(), restaurantReq.getAvgY());
-		log.info("[RestaurantController] /hello-restaurant 실행중...");
+		try {
+			pq = restaurantService.helloRecommend(restaurantReq.getMenu(), restaurantReq.getAvgX(), restaurantReq.getAvgY());
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			log.error("[RestaurantController] /hello-restaurant 실행 실패...");
+		}
+		
+		log.info("[RestaurantController] /hello-restaurant 실행끝...");
 		list.add(pq.poll());
 		list.add(pq.poll());
 		list.add(pq.poll());
@@ -76,8 +80,14 @@ public class RestaurantController {
 		Queue<Restaurant> pq = new PriorityQueue<>();
 		
 		log.info("[RestaurantController] /ai-restaurant 실행중...");
-		pq = restaurantService.aiRecommend(restaurantReq.getMenu());
-		log.info("[RestaurantController] /ai-restaurant 실행중...");
+		try {
+			pq = restaurantService.aiRecommend(restaurantReq.getMenu());
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			log.error("[RestaurantController] /ai-restaurant 실행실패...");
+		}
+		
+		log.info("[RestaurantController] /ai-restaurant 실행끝...");
 		list.add(pq.poll());
 		list.add(pq.poll());
 		list.add(pq.poll());
