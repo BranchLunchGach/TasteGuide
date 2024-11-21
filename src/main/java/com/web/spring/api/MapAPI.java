@@ -10,14 +10,12 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -35,13 +33,6 @@ public class MapAPI {
 	private  String clientSecret; // 네이버 API 비밀 키
 	@Value("${tMapAppKey}")
 	private  String appKey; //티맵 API 앱 키
-	
-	@PostConstruct
-	public void init() {
-		System.out.println("clientId="+clientId);
-		System.out.println("clientSecret="+clientSecret);
-		System.out.println("appKey="+appKey);
-	}
 	
 	// 주소를 받아 위도와 경도를 반환
     public String getGeocode(String address) {
