@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.client.RestTemplate;
 
 import com.web.spring.entity.User;
@@ -22,6 +23,7 @@ import jakarta.annotation.PostConstruct;
 
 
 @Service
+@CrossOrigin
 public class GoogleAuthService {
 	
 	@Autowired
