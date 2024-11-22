@@ -10,15 +10,20 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.client.RestTemplate;
 
 import com.web.spring.entity.User;
 
+import jakarta.annotation.PostConstruct;
 
 
-@Component
+
+@Service
+@CrossOrigin
 public class GoogleAuthService {
 	
 	@Autowired
@@ -37,11 +42,9 @@ public class GoogleAuthService {
         this.RedirectUri = env.getProperty("googleRedirectUri");
         this.TokenUrl = env.getProperty("googleTokenUrl");
     }
-		
-   
-
+    
     // Step 2: Google에서 반환한 code로 Access Token 교환
-    public String exchangeCodeForToken(String code) {
+    public String exchangeCodeForToken(String code) { 
     	System.out.println("ClientId= "+ClientId);
     	System.out.println("ClientSecret= "+ClientSecret);
     	System.out.println("RedirectUri= "+RedirectUri);
