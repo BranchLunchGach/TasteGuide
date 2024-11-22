@@ -23,7 +23,8 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class Crawler {
-	// ChromeDriver 초기화
+		
+		// ChromeDriver 초기화
 		int count = 0;
 	    WebDriver driver = null;
 	    WebDriverWait wait = null;
@@ -44,7 +45,6 @@ public class Crawler {
 	    	
 	    	log.info("[Crawler] 생성 중...");
 	    	options = new ChromeOptions();
-	        //options.addArguments("--headless"); // headless 모드 활성화
 	    	//이놈이 핵심 옵션..
 	    	options.addArguments("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36");
 	        options.addArguments("--disable-features=NetworkService");
@@ -122,10 +122,7 @@ public class Crawler {
 	                
 	                List<WebElement> openTime = driver.findElements(By.cssSelector("div.w9QyJ div.H3ua4"));
 	                
-	                if(openTime.size() == 1)
-	                	sb.append(openTime.get(0).getText()).append("}");
-	                else 
-	                	sb.append(openTime.get(1).getText()).append("}");
+                	sb.append(openTime.get(0).getText()).append("}");
 	                
 	                log.info("[Crawler - 반복 {}/{}] aiRecommend() 메뉴 크롤링...", i+1, count);
 	                
@@ -231,7 +228,7 @@ public class Crawler {
 	        	log.info("[Crawler] reviewCrawling 네이버 검색 진행 후 가게 찾으러 가기");
 	            
 	            //가게 이름 요소를 두 가지 경우에 맞게 찾기
-	            List<WebElement> shopLinks = wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.cssSelector("div>.place_bluelink>.TYaxT, div.place_bluelink.C6RjW > span.YwYLL")));
+	            List<WebElement> shopLinks = wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.cssSelector("div>.place_bluelink>.TYaxT, div.place_bluelink>span.YwYLL")));
 	            	                        
 	            //가게들의 리뷰들을 담을 컬렉션
 	            List<String> infos = new ArrayList<>();
@@ -240,7 +237,7 @@ public class Crawler {
 	            for (int i = 0; i < Math.min(count, shopLinks.size()); i++) {
 	                WebElement shop = shopLinks.get(i);
 	                
-	                WebElement shopType = driver.findElement(By.cssSelector("span.KCMnt"));               
+	                WebElement shopType = driver.findElement(By.cssSelector("span.KCMnt, span.YzBgS"));               
 	                
 	                log.info("[Crawler - 반복 {}/{}] reviewCrawlin() 반복 시작", i+1, count);
 	                sb.append(shop.getText()).append("}"); //sb.append("[매장 이름] : " + shop.getText()).append("\n");
@@ -275,7 +272,6 @@ public class Crawler {
 	                    	for(WebElement w : locationNum) {
 	                    		num += w.getText();
 	                    	}
-	                    	System.out.println(num);
 	                    	sb.append(location.getText().replace("\n", " ").replace("미터", "").replace(num, "")).append("}");
 	                    }
 	                } catch (NoSuchElementException e) {
@@ -417,7 +413,7 @@ public class Crawler {
 	            	
 	                WebElement shop = shopLinks.get(i);
 	                
-	                WebElement shopType = driver.findElement(By.cssSelector("span.KCMnt"));	                
+	                WebElement shopType = driver.findElement(By.cssSelector("span.KCMnt, span.YzBgS"));	                
 	                
 	                sb.append(shop.getText()).append("}"); //sb.append("[매장 이름] : " + shop.getText()).append("\n");
 	                sb.append(shopType.getText()).append("}"); //sb.append("[매장 타입] : " + shopType.getText()).append("\n");
@@ -655,7 +651,7 @@ public class Crawler {
 	        }
 	    }
 	    
-	 // 메뉴 탭에서 메뉴 정보 가져오기
+	    // 메뉴 탭에서 메뉴 정보 가져오기
 	    private String menuCrawling(WebDriver driver) {
 	    	List<String> menu = new ArrayList<>();
 	    	List<WebElement> allMenuElements = driver.findElements(By.cssSelector(".E2jtL, li.order_list_item"));
@@ -703,7 +699,6 @@ public class Crawler {
 	        	} catch(NoSuchElementException e) {
 	        		log.warn("[Crawler] reviewRecommendKeyword() 버튼을 찾지 못했습니다. 재시도 중 {} / {}", i+1, 3);
 	                i++;
-	                
 	                try {
 	                    Thread.sleep(1000); // 재시도 전 대기
 	                } catch (InterruptedException ie) {
@@ -717,7 +712,6 @@ public class Crawler {
 	            List<WebElement> reviewBenefits = driver.findElements(By.cssSelector(".MHaAm"));
 	            
 	            for (WebElement benefits : reviewBenefits) {
-	            	System.out.println(benefits.getText());
 	            	String keyword = benefits.findElement(By.cssSelector(".t3JSf")).getText(); 
 	            	String text = benefits.findElement(By.cssSelector(".CUoLy")).getText();
 	            	String cnt = text.replace("이 키워드를 선택한 인원", "").trim();  // "256"만 남기도록 텍스트를 대체합니다.

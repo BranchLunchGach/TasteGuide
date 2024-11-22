@@ -29,7 +29,7 @@ public class RestaurantService {
 		
 		Queue<Restaurant> pq = new PriorityQueue<>();
 		
-		Crawler crawler = new Crawler(10);	
+		Crawler crawler = new Crawler(5, 0);	
 		
 		List<String> lists = crawler.reviewCrawling(menu); //String 하나가 가게 하나의 모든 정보..	
 		
