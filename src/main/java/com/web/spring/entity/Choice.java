@@ -39,7 +39,7 @@ public class Choice {
 	private User user;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "menu_id")
+	@JoinColumn(name = "menu_no")
 	private Menu menu;
 
 	@Override
