@@ -103,8 +103,10 @@ public class UserController {
 		return ResponseEntity.status(200).body(rUser);
 	}
 	
-	@DeleteMapping("/users/{id}")
+	@DeleteMapping("/users/{userId}")
 	public ResponseEntity<?> deleteUser(@PathVariable String userId){
+		System.out.println("controller deleteUser Start");
+		System.out.println("userId= "+userId);
 		userService.deleteUser(userId);
 		return ResponseEntity.status(200).body("성공");
 	}
