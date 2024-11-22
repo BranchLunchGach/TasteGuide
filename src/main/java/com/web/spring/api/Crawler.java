@@ -256,7 +256,7 @@ public class Crawler {
 	                	String time = times.get(0).getText();
 	                	if(time.equals("오늘 휴무")) sb.append("오늘 휴무").append("}");
 	                	else  sb.append("0").append("}");
-	                } else sb.append("0");
+	                } else sb.append("0").append("}");
 	                
 	                //주소 및 위치 가져와 보기.
 	                WebElement address = driver.findElement(By.cssSelector("span.LDgIH"));	               
